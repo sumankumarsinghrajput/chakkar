@@ -1,0 +1,83 @@
+{
+  "project_info": {
+    "project_number": "999213489105",
+    "firebase_url": "https://chakkar-9695a-default-rtdb.firebaseio.com",
+    "project_id": "chakkar-9695a",
+    "storage_bucket": "chakkar-9695a.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:999213489105:android:2b3de38c6bd36c034cdef0",
+        "android_client_info": {
+          "package_name": "com.chakkar.chakkar"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "999213489105-tk4g6rp0mlqo7m5e7kqisvke9lj6u1v7.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD-t_eNw1TTc1Ch3Tc2yM2B8pzOAyKYrn8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "999213489105-tk4g6rp0mlqo7m5e7kqisvke9lj6u1v7.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "999213489105-6ann3hjma25r9ucvpaogdrtvs23a1s9r.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.chakkar.chakkar"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:999213489105:android:fef9ab105dbed6304cdef0",
+        "android_client_info": {
+          "package_name": "com.sumankumar.chakkar"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "999213489105-tk4g6rp0mlqo7m5e7kqisvke9lj6u1v7.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD-t_eNw1TTc1Ch3Tc2yM2B8pzOAyKYrn8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "999213489105-tk4g6rp0mlqo7m5e7kqisvke9lj6u1v7.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "999213489105-6ann3hjma25r9ucvpaogdrtvs23a1s9r.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.chakkar.chakkar"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

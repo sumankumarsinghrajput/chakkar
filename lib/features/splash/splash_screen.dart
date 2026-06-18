@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../core/constants/app_colors.dart';
+import '../auth/presentation/welcome_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -36,9 +37,7 @@ class _SplashScreenState extends State<SplashScreen>
       if (mounted) {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(
-            builder: (_) => const _WelcomePlaceholder(),
-          ),
+          MaterialPageRoute(builder: (_) => const WelcomeScreen()),
         );
       }
     });
@@ -65,7 +64,6 @@ class _SplashScreenState extends State<SplashScreen>
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    // Logo placeholder
                     Container(
                       width: 120,
                       height: 120,
@@ -87,7 +85,6 @@ class _SplashScreenState extends State<SplashScreen>
                       ),
                     ),
                     const SizedBox(height: 24),
-                    // App Name
                     Text(
                       'CHAKKAR',
                       style: Theme.of(context)
@@ -114,25 +111,6 @@ class _SplashScreenState extends State<SplashScreen>
               ),
             );
           },
-        ),
-      ),
-    );
-  }
-}
-
-// Temporary placeholder
-class _WelcomePlaceholder extends StatelessWidget {
-  const _WelcomePlaceholder();
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      body: Center(
-        child: Text(
-          'Welcome Screen\nComing Next',
-          textAlign: TextAlign.center,
-          style: Theme.of(context).textTheme.headlineMedium,
         ),
       ),
     );

@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/constants/app_colors.dart';
 import '../data/auth_provider.dart';
 import '../../home/home_screen.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import '../../onboarding/gender_screen.dart';
 
 class WelcomeScreen extends ConsumerWidget {
   const WelcomeScreen({super.key});
@@ -12,12 +14,25 @@ class WelcomeScreen extends ConsumerWidget {
     final authState = ref.watch(authNotifierProvider);
 
     ref.listen(authStateProvider, (previous, next) {
-      next.whenData((user) {
+      next.whenData((user) async {
         if (user != null) {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (_) => const HomeScreen()),
-          );
+          // Check if profile exists
+          final doc = await FirebaseFirestore.instance
+              .collection('users')
+              .doc(user.uid)
+              .get();
+          if (!context.mounted) return;
+          if (doc.exists) {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (_) => const HomeScreen()),
+            );
+          } else {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (_) => const GenderScreen()),
+            );
+          }
         }
       });
     });

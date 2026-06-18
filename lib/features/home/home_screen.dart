@@ -7,6 +7,7 @@ import '../game/category_screen.dart';
 import '../multiplayer/multiplayer_menu_screen.dart';
 import '../leaderboard/leaderboard_screen.dart';
 import '../achievements/achievements_screen.dart';
+import '../profile/profile_screen.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -314,7 +315,14 @@ class _BottomNav extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
           _NavItem(icon: Icons.home, label: 'Home', active: true),
-          _NavItem(icon: Icons.person, label: 'Profile'),
+          _NavItem(
+            icon: Icons.person,
+            label: 'Profile',
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const ProfileScreen()),
+            ),
+          ),
           _NavItem(icon: Icons.card_giftcard, label: 'Rewards'),
           _NavItem(icon: Icons.storefront, label: 'Shop'),
         ],
@@ -327,33 +335,38 @@ class _NavItem extends StatelessWidget {
   final IconData icon;
   final String label;
   final bool active;
+  final VoidCallback? onTap;
 
   const _NavItem({
     required this.icon,
     required this.label,
     this.active = false,
+    this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Icon(
-          icon,
-          color: active ? AppColors.primary : AppColors.textMuted,
-          size: 24,
-        ),
-        const SizedBox(height: 2),
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 10,
-            fontFamily: 'Rajdhani',
+    return GestureDetector(
+      onTap: onTap,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            icon,
             color: active ? AppColors.primary : AppColors.textMuted,
+            size: 24,
           ),
-        ),
-      ],
+          const SizedBox(height: 2),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 10,
+              fontFamily: 'Rajdhani',
+              color: active ? AppColors.primary : AppColors.textMuted,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

@@ -5,14 +5,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'core/theme/app_theme.dart';
 import 'features/splash/splash_screen.dart';
 import 'firebase_options.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // Lock orientation to portrait
-  await SystemChrome.setPreferredOrientations([
-    DeviceOrientation.portraitUp,
-  ]);
+  await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
 
   // Set system UI style
   SystemChrome.setSystemUIOverlayStyle(
@@ -23,15 +22,12 @@ void main() async {
   );
 
   // Initialize Firebase
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
-  runApp(
-    const ProviderScope(
-      child: ChakkarApp(),
-    ),
-  );
+  await Hive.initFlutter();
+  await Hive.openBox('chakkar_prefs');
+
+  runApp(const ProviderScope(child: ChakkarApp()));
 }
 
 class ChakkarApp extends StatelessWidget {

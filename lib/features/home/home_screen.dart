@@ -6,6 +6,7 @@ import 'home_provider.dart';
 import '../game/category_screen.dart';
 import '../multiplayer/multiplayer_menu_screen.dart';
 import '../leaderboard/leaderboard_screen.dart';
+import '../achievements/achievements_screen.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -70,7 +71,14 @@ class HomeScreen extends ConsumerWidget {
                         subtitle: 'Unlock Rewards',
                         icon: Icons.emoji_events,
                         gradient: AppColors.purpleGradient,
-                        onTap: () {},
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const AchievementsScreen(),
+                            ),
+                          );
+                        },
                       ),
                       const SizedBox(height: 12),
                       _MenuCard(

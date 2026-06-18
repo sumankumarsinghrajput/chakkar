@@ -6,16 +6,15 @@ import '../../shared/widgets/avatar_widget.dart';
 import 'room_model.dart';
 import 'room_provider.dart';
 import '../home/home_screen.dart';
+import '../game/game_models.dart';
+import '../game/game_provider.dart';
+import 'multiplayer_game_screen.dart';
 
 class LobbyScreen extends ConsumerWidget {
   final String roomId;
   final bool isJoining;
 
-  const LobbyScreen({
-    super.key,
-    required this.roomId,
-    this.isJoining = false,
-  });
+  const LobbyScreen({super.key, required this.roomId, this.isJoining = false});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -34,24 +33,18 @@ class LobbyScreen extends ConsumerWidget {
       ),
       data: (room) {
         if (room == null) {
-          return Scaffold(
+          // Auto navigate home without showing error screen
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (_) => const HomeScreen()),
+              (route) => false,
+            );
+          });
+          return const Scaffold(
             backgroundColor: AppColors.background,
             body: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Text('Room not found'),
-                  ElevatedButton(
-                    onPressed: () => Navigator.pushAndRemoveUntil(
-                      context,
-                      MaterialPageRoute(
-                          builder: (_) => const HomeScreen()),
-                      (route) => false,
-                    ),
-                    child: const Text('GO HOME'),
-                  ),
-                ],
-              ),
+              child: CircularProgressIndicator(color: AppColors.primary),
             ),
           );
         }
@@ -62,8 +55,7 @@ class LobbyScreen extends ConsumerWidget {
         // Show join request popup for host
         if (isHost && room.pendingRequests.isNotEmpty) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
-            _showJoinRequest(
-                context, ref, room, room.pendingRequests.first);
+            _showJoinRequest(context, ref, room, room.pendingRequests.first);
           });
         }
 
@@ -87,20 +79,21 @@ class LobbyScreen extends ConsumerWidget {
                             Navigator.pushAndRemoveUntil(
                               context,
                               MaterialPageRoute(
-                                  builder: (_) => const HomeScreen()),
+                                builder: (_) => const HomeScreen(),
+                              ),
                               (route) => false,
                             );
                           }
                         },
-                        icon: const Icon(Icons.arrow_back_ios,
-                            color: AppColors.textPrimary),
+                        icon: const Icon(
+                          Icons.arrow_back_ios,
+                          color: AppColors.textPrimary,
+                        ),
                       ),
                       Expanded(
                         child: Text(
                           room.roomName.toUpperCase(),
-                          style: Theme.of(context)
-                              .textTheme
-                              .headlineMedium,
+                          style: Theme.of(context).textTheme.headlineMedium,
                         ),
                       ),
                     ],
@@ -113,7 +106,8 @@ class LobbyScreen extends ConsumerWidget {
                       color: AppColors.surface,
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
-                          color: AppColors.primary.withOpacity(0.3)),
+                        color: AppColors.primary.withOpacity(0.3),
+                      ),
                     ),
                     child: Row(
                       children: [
@@ -123,16 +117,12 @@ class LobbyScreen extends ConsumerWidget {
                             children: [
                               Text(
                                 'ROOM CODE',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodyMedium
+                                style: Theme.of(context).textTheme.bodyMedium
                                     ?.copyWith(letterSpacing: 2),
                               ),
                               Text(
                                 room.roomCode,
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .headlineLarge
+                                style: Theme.of(context).textTheme.headlineLarge
                                     ?.copyWith(
                                       color: AppColors.primary,
                                       letterSpacing: 4,
@@ -144,15 +134,18 @@ class LobbyScreen extends ConsumerWidget {
                         IconButton(
                           onPressed: () {
                             Clipboard.setData(
-                                ClipboardData(text: room.roomCode));
+                              ClipboardData(text: room.roomCode),
+                            );
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
-                                  content:
-                                      Text('Room code copied!')),
+                                content: Text('Room code copied!'),
+                              ),
                             );
                           },
-                          icon: const Icon(Icons.copy,
-                              color: AppColors.primary),
+                          icon: const Icon(
+                            Icons.copy,
+                            color: AppColors.primary,
+                          ),
                         ),
                       ],
                     ),
@@ -161,19 +154,22 @@ class LobbyScreen extends ConsumerWidget {
                   // Players
                   Text(
                     'PLAYERS (${room.playerCount}/${room.maxPlayers})',
-                    style: Theme.of(context)
-                        .textTheme
-                        .bodyMedium
-                        ?.copyWith(letterSpacing: 2),
+                    style: Theme.of(
+                      context,
+                    ).textTheme.bodyMedium?.copyWith(letterSpacing: 2),
                   ),
                   const SizedBox(height: 8),
                   Expanded(
                     child: ListView(
                       children: [
-                        ...room.players.map((player) =>
-                            _PlayerTile(
-                                player: player, isHost: isHost,
-                                roomId: roomId, ref: ref)),
+                        ...room.players.map(
+                          (player) => _PlayerTile(
+                            player: player,
+                            isHost: isHost,
+                            roomId: roomId,
+                            ref: ref,
+                          ),
+                        ),
                         // Empty slots
                         ...List.generate(
                           room.maxPlayers - room.playerCount,
@@ -200,9 +196,7 @@ class LobbyScreen extends ConsumerWidget {
                           const SizedBox(width: 12),
                           Text(
                             'Waiting for host approval...',
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodyMedium,
+                            style: Theme.of(context).textTheme.bodyMedium,
                           ),
                         ],
                       ),
@@ -212,7 +206,23 @@ class LobbyScreen extends ConsumerWidget {
                   if (isHost)
                     ElevatedButton(
                       onPressed: room.playerCount >= 2
-                          ? () {}
+                          ? () {
+                              final questions = getQuestions(
+                                GameCategory.brainTrap,
+                                Difficulty.easy,
+                              );
+                              Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => MultiplayerGameScreen(
+                                    roomId: roomId,
+                                    isHost: true,
+                                    questions: questions,
+                                    players: room.players,
+                                  ),
+                                ),
+                              );
+                            }
                           : null,
                       child: Text(
                         room.playerCount >= 2
@@ -229,16 +239,17 @@ class LobbyScreen extends ConsumerWidget {
     );
   }
 
-  void _showJoinRequest(BuildContext context, WidgetRef ref,
-      RoomModel room, String playerId) {
+  void _showJoinRequest(
+    BuildContext context,
+    WidgetRef ref,
+    RoomModel room,
+    String playerId,
+  ) {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => _JoinRequestDialog(
-        roomId: roomId,
-        playerId: playerId,
-        ref: ref,
-      ),
+      builder: (context) =>
+          _JoinRequestDialog(roomId: roomId, playerId: playerId, ref: ref),
     );
   }
 }
@@ -288,7 +299,9 @@ class _PlayerTile extends StatelessWidget {
                       const SizedBox(width: 8),
                       Container(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 6, vertical: 2),
+                          horizontal: 6,
+                          vertical: 2,
+                        ),
                         decoration: BoxDecoration(
                           color: AppColors.primary.withOpacity(0.2),
                           borderRadius: BorderRadius.circular(4),
@@ -312,11 +325,7 @@ class _PlayerTile extends StatelessWidget {
               ],
             ),
           ),
-          Icon(
-            Icons.circle,
-            color: AppColors.success,
-            size: 10,
-          ),
+          Icon(Icons.circle, color: AppColors.success, size: 10),
         ],
       ),
     );
@@ -332,8 +341,7 @@ class _EmptySlot extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.surface.withOpacity(0.5),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-            color: AppColors.textMuted.withOpacity(0.2)),
+        border: Border.all(color: AppColors.textMuted.withOpacity(0.2)),
       ),
       child: Row(
         children: [
@@ -343,19 +351,20 @@ class _EmptySlot extends StatelessWidget {
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: AppColors.card,
-              border: Border.all(
-                  color: AppColors.textMuted.withOpacity(0.3)),
+              border: Border.all(color: AppColors.textMuted.withOpacity(0.3)),
             ),
-            child: const Icon(Icons.person_add_outlined,
-                color: AppColors.textMuted, size: 20),
+            child: const Icon(
+              Icons.person_add_outlined,
+              color: AppColors.textMuted,
+              size: 20,
+            ),
           ),
           const SizedBox(width: 12),
           Text(
             'Waiting for player...',
-            style: Theme.of(context)
-                .textTheme
-                .bodyMedium
-                ?.copyWith(color: AppColors.textMuted),
+            style: Theme.of(
+              context,
+            ).textTheme.bodyMedium?.copyWith(color: AppColors.textMuted),
           ),
         ],
       ),
@@ -381,8 +390,8 @@ class _JoinRequestDialog extends ConsumerWidget {
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
           return const Center(
-              child:
-                  CircularProgressIndicator(color: AppColors.primary));
+            child: CircularProgressIndicator(color: AppColors.primary),
+          );
         }
         final data = snapshot.data!.data()!;
         return AlertDialog(
@@ -395,8 +404,7 @@ class _JoinRequestDialog extends ConsumerWidget {
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              AvatarWidget(
-                  avatarId: data['avatarId'] ?? '', size: 64),
+              AvatarWidget(avatarId: data['avatarId'] ?? '', size: 64),
               const SizedBox(height: 12),
               Text(
                 data['displayUsername'] ?? '',
@@ -425,11 +433,12 @@ class _JoinRequestDialog extends ConsumerWidget {
                       Navigator.pop(context);
                     },
                     style: OutlinedButton.styleFrom(
-                      side:
-                          const BorderSide(color: AppColors.danger),
+                      side: const BorderSide(color: AppColors.danger),
                     ),
-                    child: const Text('REJECT',
-                        style: TextStyle(color: AppColors.danger)),
+                    child: const Text(
+                      'REJECT',
+                      style: TextStyle(color: AppColors.danger),
+                    ),
                   ),
                 ),
                 const SizedBox(width: 12),

@@ -6,6 +6,8 @@ import 'room_model.dart';
 import '../home/home_screen.dart';
 import 'lobby_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'share_card_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class MultiplayerResultScreen extends StatelessWidget {
   final Map<String, int> scores;
@@ -141,9 +143,34 @@ class MultiplayerResultScreen extends StatelessWidget {
               ),
               const SizedBox(height: 16),
               // Buttons
+              ElevatedButton.icon(
+                onPressed: () {
+                  final currentUid = FirebaseAuth.instance.currentUser?.uid;
+                  final myEntry = ranked.firstWhere(
+                    (e) => e.key.uid == currentUid,
+                    orElse: () => ranked.last,
+                  );
+                  final myRank = ranked.indexOf(myEntry) + 1;
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => ShareCardScreen(
+                        username: myEntry.key.username,
+                        avatarId: myEntry.key.avatarId,
+                        rank: myRank,
+                        score: myEntry.value,
+                        totalPlayers: ranked.length,
+                        isWinner: myRank == 1,
+                      ),
+                    ),
+                  );
+                },
+                icon: const Icon(Icons.share),
+                label: const Text('SHARE RESULT'),
+              ),
+              const SizedBox(height: 12),
               ElevatedButton(
                 onPressed: () async {
-                  // Reset room status back to waiting
                   await FirebaseFirestore.instance
                       .collection('rooms')
                       .doc(roomId)
@@ -157,6 +184,9 @@ class MultiplayerResultScreen extends StatelessWidget {
                     (route) => false,
                   );
                 },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.surface,
+                ),
                 child: const Text('BACK TO LOBBY'),
               ),
               const SizedBox(height: 12),

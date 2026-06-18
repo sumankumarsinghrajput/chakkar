@@ -5,6 +5,7 @@ import '../../shared/widgets/avatar_widget.dart';
 import 'home_provider.dart';
 import '../game/category_screen.dart';
 import '../multiplayer/multiplayer_menu_screen.dart';
+import '../leaderboard/leaderboard_screen.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -160,11 +161,13 @@ class _TopBar extends StatelessWidget {
           const SizedBox(width: 8),
           // Settings
           IconButton(
-            onPressed: () {},
-            icon: const Icon(
-              Icons.settings_outlined,
-              color: AppColors.textSecondary,
-            ),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const LeaderboardScreen()),
+              );
+            },
+            icon: const Icon(Icons.leaderboard, color: AppColors.textSecondary),
           ),
         ],
       ),

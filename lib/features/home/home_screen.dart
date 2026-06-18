@@ -4,6 +4,7 @@ import '../../core/constants/app_colors.dart';
 import '../../shared/widgets/avatar_widget.dart';
 import 'home_provider.dart';
 import '../game/category_screen.dart';
+import '../multiplayer/multiplayer_menu_screen.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -53,7 +54,14 @@ class HomeScreen extends ConsumerWidget {
                         subtitle: 'Play with Real Players',
                         icon: Icons.groups,
                         gradient: AppColors.primaryGradient,
-                        onTap: () {},
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const MultiplayerMenuScreen(),
+                            ),
+                          );
+                        },
                       ),
                       const SizedBox(height: 12),
                       _MenuCard(

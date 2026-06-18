@@ -1,20 +1,17 @@
 import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'room_model.dart';
 
 final firestore = FirebaseFirestore.instance;
 final auth = FirebaseAuth.instance;
 
-// Generate room code
 String generateRoomCode() {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
   final random = Random();
-  final code = List.generate(
-    3,
-    (_) => chars[random.nextInt(chars.length)],
-  ).join();
+  final code = List.generate(3, (_) => chars[random.nextInt(chars.length)]).join();
   final nums = List.generate(4, (_) => random.nextInt(10).toString()).join();
   return '$code-$nums';
 }
@@ -34,13 +31,11 @@ class RoomNotifier extends StateNotifier<AsyncValue<RoomModel?>> {
       final user = auth.currentUser;
       if (user == null) throw Exception('Not logged in');
 
-      // Get user profile
       final userDoc = await firestore.collection('users').doc(user.uid).get();
       final userData = userDoc.data()!;
 
       final roomCode = customCode ?? generateRoomCode();
 
-      // Check code not taken
       final existing = await firestore
           .collection('rooms')
           .where('roomCode', isEqualTo: roomCode)
@@ -114,7 +109,8 @@ class RoomNotifier extends StateNotifier<AsyncValue<RoomModel?>> {
 
   Future<void> approvePlayer(String roomId, String playerId) async {
     try {
-      final playerDoc = await firestore.collection('users').doc(playerId).get();
+      final playerDoc =
+          await firestore.collection('users').doc(playerId).get();
       final playerData = playerDoc.data()!;
 
       final playerMap = {
@@ -141,6 +137,12 @@ class RoomNotifier extends StateNotifier<AsyncValue<RoomModel?>> {
     });
   }
 
+  Future<void> startGame(String roomId) async {
+    await firestore.collection('rooms').doc(roomId).update({
+      'status': 'playing',
+    });
+  }
+
   Future<void> leaveRoom(String roomId) async {
     final user = auth.currentUser;
     if (user == null) return;
@@ -149,7 +151,6 @@ class RoomNotifier extends StateNotifier<AsyncValue<RoomModel?>> {
     final data = room.data();
     if (data == null) return;
 
-    // If host leaves, delete entire room
     if (data['hostId'] == user.uid) {
       await firestore.collection('rooms').doc(roomId).delete();
     } else {
@@ -158,34 +159,85 @@ class RoomNotifier extends StateNotifier<AsyncValue<RoomModel?>> {
       });
     }
   }
+
+  Future<void> transferHostIfNeeded(
+      String roomId, String leavingUid) async {
+    final roomDoc =
+        await firestore.collection('rooms').doc(roomId).get();
+    final data = roomDoc.data();
+    if (data == null) return;
+
+    final playersMap =
+        data['players'] as Map<String, dynamic>? ?? {};
+    final playerIds = playersMap.keys.toList();
+    playerIds.remove(leavingUid);
+
+    if (playerIds.isEmpty) {
+      await firestore.collection('rooms').doc(roomId).delete();
+      return;
+    }
+
+    if (data['hostId'] == leavingUid) {
+      final newHostId = playerIds.first;
+      await firestore.collection('rooms').doc(roomId).update({
+        'hostId': newHostId,
+        'players.$newHostId.isHost': true,
+        'players.$leavingUid': FieldValue.delete(),
+      });
+    } else {
+      await firestore.collection('rooms').doc(roomId).update({
+        'players.$leavingUid': FieldValue.delete(),
+      });
+    }
+  }
+
+  Future<void> handlePlayerLeavesDuringGame(
+      String roomId, String leavingUid) async {
+    final roomDoc =
+        await firestore.collection('rooms').doc(roomId).get();
+    final data = roomDoc.data();
+    if (data == null) return;
+
+    final playersMap =
+        data['players'] as Map<String, dynamic>? ?? {};
+    final remainingCount = playersMap.length - 1;
+
+    if (remainingCount < 2) {
+      await firestore.collection('rooms').doc(roomId).update({
+        'status': 'finished',
+        'players.$leavingUid': FieldValue.delete(),
+      });
+      await FirebaseDatabase.instance
+          .ref('games/$roomId')
+          .update({'isFinished': true});
+    } else {
+      await firestore.collection('rooms').doc(roomId).update({
+        'players.$leavingUid': FieldValue.delete(),
+      });
+    }
+  }
 }
 
 final roomProvider =
     StateNotifierProvider<RoomNotifier, AsyncValue<RoomModel?>>((ref) {
-      return RoomNotifier();
-    });
+  return RoomNotifier();
+});
 
-// Stream a single room
-final roomStreamProvider = StreamProvider.family<RoomModel?, String>((
-  ref,
-  roomId,
-) {
+final roomStreamProvider =
+    StreamProvider.family<RoomModel?, String>((ref, roomId) {
   return firestore.collection('rooms').doc(roomId).snapshots().map((doc) {
     if (!doc.exists) return null;
     return RoomModel.fromMap(doc.data()!, doc.id);
   });
 });
 
-// Stream public rooms
 final publicRoomsProvider = StreamProvider<List<RoomModel>>((ref) {
   return firestore
       .collection('rooms')
       .where('isPublic', isEqualTo: true)
       .where('status', isEqualTo: 'waiting')
       .snapshots()
-      .map(
-        (query) => query.docs
-            .map((doc) => RoomModel.fromMap(doc.data(), doc.id))
-            .toList(),
-      );
+      .map((query) => query.docs
+          .map((doc) => RoomModel.fromMap(doc.data(), doc.id))
+          .toList());
 });

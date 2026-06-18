@@ -3,9 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/constants/app_colors.dart';
 import '../../shared/widgets/avatar_widget.dart';
 import '../game/game_models.dart';
+import '../home/home_screen.dart';
 import 'multiplayer_game_provider.dart';
 import 'multiplayer_result_screen.dart';
 import 'room_model.dart';
+import 'room_provider.dart';
 
 class MultiplayerGameScreen extends ConsumerStatefulWidget {
   final String roomId;
@@ -43,8 +45,8 @@ class _MultiplayerGameScreenState
   @override
   Widget build(BuildContext context) {
     final gameState = ref.watch(multiplayerGameProvider(_params));
-    final notifier =
-        ref.read(multiplayerGameProvider(_params).notifier);
+    final notifier = ref.read(multiplayerGameProvider(_params).notifier);
+    final roomAsync = ref.watch(roomStreamProvider(widget.roomId));
 
     if (gameState.isFinished) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -61,13 +63,27 @@ class _MultiplayerGameScreenState
       });
     }
 
+    roomAsync.whenData((room) {
+      if (room == null) return;
+      final currentUid = auth.currentUser?.uid;
+      final stillInRoom = room.players.any((p) => p.uid == currentUid);
+      if (!stillInRoom) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (_) => const HomeScreen()),
+            (route) => false,
+          );
+        });
+      }
+    });
+
     final question = gameState.currentQuestion;
     if (question == null) {
       return const Scaffold(
         backgroundColor: AppColors.background,
         body: Center(
-          child:
-              CircularProgressIndicator(color: AppColors.primary),
+          child: CircularProgressIndicator(color: AppColors.primary),
         ),
       );
     }
@@ -82,6 +98,28 @@ class _MultiplayerGameScreenState
               // Top bar
               Row(
                 children: [
+                  IconButton(
+                    onPressed: () async {
+                      await ref
+                          .read(roomProvider.notifier)
+                          .handlePlayerLeavesDuringGame(
+                            widget.roomId,
+                            auth.currentUser?.uid ?? '',
+                          );
+                      if (context.mounted) {
+                        Navigator.pushAndRemoveUntil(
+                          context,
+                          MaterialPageRoute(
+                              builder: (_) => const HomeScreen()),
+                          (route) => false,
+                        );
+                      }
+                    },
+                    icon: const Icon(
+                      Icons.exit_to_app,
+                      color: AppColors.danger,
+                    ),
+                  ),
                   Expanded(
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(8),
@@ -149,8 +187,7 @@ class _MultiplayerGameScreenState
                 child: ListView(
                   scrollDirection: Axis.horizontal,
                   children: widget.players.map((player) {
-                    final score =
-                        gameState.scores[player.uid] ?? 0;
+                    final score = gameState.scores[player.uid] ?? 0;
                     return Container(
                       margin: const EdgeInsets.only(right: 8),
                       padding: const EdgeInsets.symmetric(
@@ -165,10 +202,8 @@ class _MultiplayerGameScreenState
                               avatarId: player.avatarId, size: 32),
                           const SizedBox(width: 8),
                           Column(
-                            mainAxisAlignment:
-                                MainAxisAlignment.center,
-                            crossAxisAlignment:
-                                CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
                                 player.username,
@@ -182,8 +217,7 @@ class _MultiplayerGameScreenState
                                 style: Theme.of(context)
                                     .textTheme
                                     .titleLarge
-                                    ?.copyWith(
-                                        color: AppColors.primary),
+                                    ?.copyWith(color: AppColors.primary),
                               ),
                             ],
                           ),
@@ -207,8 +241,7 @@ class _MultiplayerGameScreenState
                 ),
                 child: Text(
                   question.question,
-                  style:
-                      Theme.of(context).textTheme.headlineMedium,
+                  style: Theme.of(context).textTheme.headlineMedium,
                   textAlign: TextAlign.center,
                 ),
               ),
@@ -231,13 +264,10 @@ class _MultiplayerGameScreenState
 
                     if (gameState.answered) {
                       if (index == question.correctIndex) {
-                        bgColor =
-                            AppColors.success.withOpacity(0.3);
+                        bgColor = AppColors.success.withOpacity(0.3);
                         borderColor = AppColors.success;
-                      } else if (index ==
-                          gameState.selectedIndex) {
-                        bgColor =
-                            AppColors.danger.withOpacity(0.3);
+                      } else if (index == gameState.selectedIndex) {
+                        bgColor = AppColors.danger.withOpacity(0.3);
                         borderColor = AppColors.danger;
                       }
                     }
@@ -250,15 +280,14 @@ class _MultiplayerGameScreenState
                         decoration: BoxDecoration(
                           color: bgColor,
                           borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                              color: borderColor, width: 2),
+                          border:
+                              Border.all(color: borderColor, width: 2),
                         ),
                         child: Center(
                           child: Text(
                             question.options[index],
-                            style: Theme.of(context)
-                                .textTheme
-                                .titleLarge,
+                            style:
+                                Theme.of(context).textTheme.titleLarge,
                             textAlign: TextAlign.center,
                           ),
                         ),

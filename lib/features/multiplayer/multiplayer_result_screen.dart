@@ -4,6 +4,8 @@ import '../../core/constants/app_colors.dart';
 import '../../shared/widgets/avatar_widget.dart';
 import 'room_model.dart';
 import '../home/home_screen.dart';
+import 'lobby_screen.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class MultiplayerResultScreen extends StatelessWidget {
   final Map<String, int> scores;
@@ -29,8 +31,7 @@ class MultiplayerResultScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final ranked = _rankedPlayers;
     final currentUid = FirebaseAuth.instance.currentUser?.uid;
-    final myRank =
-        ranked.indexWhere((e) => e.key.uid == currentUid) + 1;
+    final myRank = ranked.indexWhere((e) => e.key.uid == currentUid) + 1;
     final isWinner = myRank == 1;
 
     return Scaffold(
@@ -44,25 +45,16 @@ class MultiplayerResultScreen extends StatelessWidget {
               // Result Title
               Text(
                 isWinner ? 'YOU WIN!' : 'MATCH OVER!',
-                style: Theme.of(context)
-                    .textTheme
-                    .displayMedium
-                    ?.copyWith(
-                      color: isWinner
-                          ? AppColors.success
-                          : AppColors.primary,
-                    ),
+                style: Theme.of(context).textTheme.displayMedium?.copyWith(
+                  color: isWinner ? AppColors.success : AppColors.primary,
+                ),
               ),
               const SizedBox(height: 8),
               Text(
-                isWinner
-                    ? 'Brain Master!'
-                    : 'Rank #$myRank',
-                style: Theme.of(context)
-                    .textTheme
-                    .headlineMedium
-                    ?.copyWith(
-                        color: AppColors.textSecondary),
+                isWinner ? 'Brain Master!' : 'Rank #$myRank',
+                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                  color: AppColors.textSecondary,
+                ),
               ),
               const SizedBox(height: 24),
               // Scoreboard
@@ -90,9 +82,7 @@ class MultiplayerResultScreen extends StatelessWidget {
                             : AppColors.surface,
                         borderRadius: BorderRadius.circular(14),
                         border: Border.all(
-                          color: isMe
-                              ? AppColors.primary
-                              : AppColors.card,
+                          color: isMe ? AppColors.primary : AppColors.card,
                           width: isMe ? 2 : 1,
                         ),
                       ),
@@ -103,29 +93,22 @@ class MultiplayerResultScreen extends StatelessWidget {
                             width: 32,
                             child: Text(
                               '#$rank',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .headlineMedium
+                              style: Theme.of(context).textTheme.headlineMedium
                                   ?.copyWith(color: rankColor),
                             ),
                           ),
                           const SizedBox(width: 12),
                           // Avatar
-                          AvatarWidget(
-                              avatarId: player.avatarId,
-                              size: 44),
+                          AvatarWidget(avatarId: player.avatarId, size: 44),
                           const SizedBox(width: 12),
                           // Name
                           Expanded(
                             child: Column(
-                              crossAxisAlignment:
-                                  CrossAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
                                   player.username,
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .titleLarge
+                                  style: Theme.of(context).textTheme.titleLarge
                                       ?.copyWith(
                                         color: isMe
                                             ? AppColors.primary
@@ -147,12 +130,8 @@ class MultiplayerResultScreen extends StatelessWidget {
                           // Score
                           Text(
                             '$score',
-                            style: Theme.of(context)
-                                .textTheme
-                                .headlineMedium
-                                ?.copyWith(
-                                  color: rankColor,
-                                ),
+                            style: Theme.of(context).textTheme.headlineMedium
+                                ?.copyWith(color: rankColor),
                           ),
                         ],
                       ),
@@ -163,13 +142,41 @@ class MultiplayerResultScreen extends StatelessWidget {
               const SizedBox(height: 16),
               // Buttons
               ElevatedButton(
+                onPressed: () async {
+                  // Reset room status back to waiting
+                  await FirebaseFirestore.instance
+                      .collection('rooms')
+                      .doc(roomId)
+                      .update({'status': 'waiting'});
+                  if (!context.mounted) return;
+                  Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => LobbyScreen(roomId: roomId),
+                    ),
+                    (route) => false,
+                  );
+                },
+                child: const Text('BACK TO LOBBY'),
+              ),
+              const SizedBox(height: 12),
+              OutlinedButton(
                 onPressed: () => Navigator.pushAndRemoveUntil(
                   context,
-                  MaterialPageRoute(
-                      builder: (_) => const HomeScreen()),
+                  MaterialPageRoute(builder: (_) => const HomeScreen()),
                   (route) => false,
                 ),
-                child: const Text('HOME'),
+                style: OutlinedButton.styleFrom(
+                  minimumSize: const Size(double.infinity, 56),
+                  side: const BorderSide(color: AppColors.primary),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: const Text(
+                  'HOME',
+                  style: TextStyle(color: AppColors.primary),
+                ),
               ),
             ],
           ),

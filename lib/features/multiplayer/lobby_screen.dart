@@ -52,6 +52,42 @@ class LobbyScreen extends ConsumerWidget {
         final currentUid = auth.currentUser?.uid;
         final isHost = room.hostId == currentUid;
 
+        // If joining player got approved, navigate to game
+        final isApproved = room.players.any((p) => p.uid == currentUid);
+
+        // If game started, navigate all players to game
+        if (room.status == RoomStatus.playing && !isJoining) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            final questions = getQuestions(
+              GameCategory.brainTrap,
+              Difficulty.easy,
+            );
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (_) => MultiplayerGameScreen(
+                  roomId: roomId,
+                  isHost: isHost,
+                  questions: questions,
+                  players: room.players,
+                ),
+              ),
+            );
+          });
+        }
+
+        // If joining player got approved show lobby
+        if (isJoining && !isHost && isApproved) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (_) => LobbyScreen(roomId: roomId, isJoining: false),
+              ),
+            );
+          });
+        }
+
         // Show join request popup for host
         if (isHost && room.pendingRequests.isNotEmpty) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -206,22 +242,10 @@ class LobbyScreen extends ConsumerWidget {
                   if (isHost)
                     ElevatedButton(
                       onPressed: room.playerCount >= 2
-                          ? () {
-                              final questions = getQuestions(
-                                GameCategory.brainTrap,
-                                Difficulty.easy,
-                              );
-                              Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => MultiplayerGameScreen(
-                                    roomId: roomId,
-                                    isHost: true,
-                                    questions: questions,
-                                    players: room.players,
-                                  ),
-                                ),
-                              );
+                          ? () async {
+                              await ref
+                                  .read(roomProvider.notifier)
+                                  .startGame(roomId);
                             }
                           : null,
                       child: Text(

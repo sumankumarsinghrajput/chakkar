@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/constants/app_colors.dart';
 import '../../shared/widgets/avatar_widget.dart';
 import 'home_provider.dart';
+import '../game/category_screen.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -37,7 +38,14 @@ class HomeScreen extends ConsumerWidget {
                         gradient: const LinearGradient(
                           colors: [Color(0xFF1D4ED8), Color(0xFF3B82F6)],
                         ),
-                        onTap: () {},
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const CategoryScreen(),
+                            ),
+                          );
+                        },
                       ),
                       const SizedBox(height: 12),
                       _MenuCard(
@@ -107,17 +115,16 @@ class _TopBar extends StatelessWidget {
                 ),
                 Text(
                   'Level ${user?.level ?? 1}',
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: AppColors.primary,
-                      ),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodyMedium?.copyWith(color: AppColors.primary),
                 ),
               ],
             ),
           ),
           // Coins
           Container(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
             decoration: BoxDecoration(
               color: AppColors.surface,
               borderRadius: BorderRadius.circular(20),
@@ -135,9 +142,9 @@ class _TopBar extends StatelessWidget {
                 const SizedBox(width: 4),
                 Text(
                   '${user?.coins ?? 0}',
-                  style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                        color: Color(0xFFF59E0B),
-                      ),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.labelLarge?.copyWith(color: Color(0xFFF59E0B)),
                 ),
               ],
             ),
@@ -168,9 +175,7 @@ class _DailyChallenge extends StatelessWidget {
           colors: [Color(0xFF78350F), Color(0xFFB45309)],
         ),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: const Color(0xFFF59E0B).withOpacity(0.4),
-        ),
+        border: Border.all(color: const Color(0xFFF59E0B).withOpacity(0.4)),
       ),
       child: Row(
         children: [
@@ -186,31 +191,30 @@ class _DailyChallenge extends StatelessWidget {
               children: [
                 Text(
                   'DAILY CHALLENGE',
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                        color: Colors.white,
-                      ),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.titleLarge?.copyWith(color: Colors.white),
                 ),
                 Text(
                   'Complete & Earn Big!',
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: const Color(0xFFFCD34D),
-                      ),
+                    color: const Color(0xFFFCD34D),
+                  ),
                 ),
               ],
             ),
           ),
           Container(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             decoration: BoxDecoration(
               color: const Color(0xFFF59E0B),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Text(
               'PLAY',
-              style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                    color: Colors.black,
-                  ),
+              style: Theme.of(
+                context,
+              ).textTheme.labelLarge?.copyWith(color: Colors.black),
             ),
           ),
         ],
@@ -255,27 +259,20 @@ class _MenuCard extends StatelessWidget {
                 children: [
                   Text(
                     title,
-                    style: Theme.of(context)
-                        .textTheme
-                        .headlineMedium
-                        ?.copyWith(color: Colors.white),
+                    style: Theme.of(
+                      context,
+                    ).textTheme.headlineMedium?.copyWith(color: Colors.white),
                   ),
                   Text(
                     subtitle,
-                    style: Theme.of(context)
-                        .textTheme
-                        .bodyMedium
-                        ?.copyWith(
-                            color: Colors.white.withOpacity(0.8)),
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: Colors.white.withOpacity(0.8),
+                    ),
                   ),
                 ],
               ),
             ),
-            const Icon(
-              Icons.arrow_forward_ios,
-              color: Colors.white,
-              size: 20,
-            ),
+            const Icon(Icons.arrow_forward_ios, color: Colors.white, size: 20),
           ],
         ),
       ),
@@ -291,9 +288,7 @@ class _BottomNav extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.surface,
         border: Border(
-          top: BorderSide(
-            color: AppColors.primary.withOpacity(0.2),
-          ),
+          top: BorderSide(color: AppColors.primary.withOpacity(0.2)),
         ),
       ),
       child: Row(

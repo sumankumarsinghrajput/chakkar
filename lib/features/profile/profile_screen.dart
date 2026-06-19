@@ -4,6 +4,7 @@ import '../../core/constants/app_colors.dart';
 import '../../shared/widgets/avatar_widget.dart';
 import '../auth/presentation/welcome_screen.dart';
 import 'profile_provider.dart';
+import '../match_history/match_history_screen.dart';
 
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
@@ -17,22 +18,22 @@ class ProfileScreen extends ConsumerWidget {
       appBar: AppBar(
         title: const Text('PROFILE'),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios,
-              color: AppColors.textPrimary),
+          icon: const Icon(Icons.arrow_back_ios, color: AppColors.textPrimary),
           onPressed: () => Navigator.pop(context),
         ),
         actions: [
           IconButton(
             onPressed: () {},
-            icon: const Icon(Icons.settings_outlined,
-                color: AppColors.textSecondary),
+            icon: const Icon(
+              Icons.settings_outlined,
+              color: AppColors.textSecondary,
+            ),
           ),
         ],
       ),
       body: profileAsync.when(
         loading: () => const Center(
-          child:
-              CircularProgressIndicator(color: AppColors.primary),
+          child: CircularProgressIndicator(color: AppColors.primary),
         ),
         error: (e, _) => Center(child: Text(e.toString())),
         data: (user) {
@@ -51,7 +52,8 @@ class ProfileScreen extends ConsumerWidget {
                     color: AppColors.surface,
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(
-                        color: AppColors.primary.withOpacity(0.3)),
+                      color: AppColors.primary.withOpacity(0.3),
+                    ),
                   ),
                   child: Column(
                     children: [
@@ -66,43 +68,37 @@ class ProfileScreen extends ConsumerWidget {
                         children: [
                           Text(
                             user.displayUsername,
-                            style: Theme.of(context)
-                                .textTheme
-                                .headlineLarge,
+                            style: Theme.of(context).textTheme.headlineLarge,
                           ),
                           const SizedBox(width: 8),
-                          const Icon(Icons.edit,
-                              color: AppColors.textMuted,
-                              size: 18),
+                          const Icon(
+                            Icons.edit,
+                            color: AppColors.textMuted,
+                            size: 18,
+                          ),
                         ],
                       ),
                       const SizedBox(height: 4),
                       Text(
                         'Level ${user.level}',
-                        style: Theme.of(context)
-                            .textTheme
-                            .bodyMedium
-                            ?.copyWith(color: AppColors.primary),
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: AppColors.primary,
+                        ),
                       ),
                       const SizedBox(height: 12),
                       // XP Bar
                       Column(
                         children: [
                           Row(
-                            mainAxisAlignment:
-                                MainAxisAlignment.spaceBetween,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
                                 '${user.xp} XP',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodyMedium,
+                                style: Theme.of(context).textTheme.bodyMedium,
                               ),
                               Text(
                                 '${user.xpForNextLevel} XP',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodyMedium,
+                                style: Theme.of(context).textTheme.bodyMedium,
                               ),
                             ],
                           ),
@@ -110,12 +106,11 @@ class ProfileScreen extends ConsumerWidget {
                           ClipRRect(
                             borderRadius: BorderRadius.circular(8),
                             child: LinearProgressIndicator(
-                              value: user.xpProgress
-                                  .clamp(0.0, 1.0),
+                              value: user.xpProgress.clamp(0.0, 1.0),
                               backgroundColor: AppColors.card,
-                              valueColor:
-                                  const AlwaysStoppedAnimation(
-                                      AppColors.primary),
+                              valueColor: const AlwaysStoppedAnimation(
+                                AppColors.primary,
+                              ),
                               minHeight: 8,
                             ),
                           ),
@@ -142,8 +137,7 @@ class ProfileScreen extends ConsumerWidget {
                     const SizedBox(width: 12),
                     _StatCard(
                       label: 'WIN RATE',
-                      value:
-                          '${user.winRate.toStringAsFixed(0)}%',
+                      value: '${user.winRate.toStringAsFixed(0)}%',
                       color: AppColors.secondary,
                     ),
                   ],
@@ -180,41 +174,24 @@ class ProfileScreen extends ConsumerWidget {
                   subtitle: 'Detailed Statistics',
                   onTap: () {},
                 ),
-                const SizedBox(height: 8),
-                _ProfileMenuItem(
-                  icon: Icons.history,
-                  label: 'MATCH HISTORY',
-                  subtitle: 'Your Recent Matches',
-                  onTap: () {},
-                ),
-                const SizedBox(height: 8),
-                _ProfileMenuItem(
-                  icon: Icons.people,
-                  label: 'FRIENDS',
-                  subtitle: 'Manage Friends',
-                  onTap: () {},
-                ),
                 const SizedBox(height: 24),
                 // Sign Out
                 OutlinedButton(
                   onPressed: () async {
-                    await ref
-                        .read(profileNotifierProvider.notifier)
-                        .signOut();
+                    await ref.read(profileNotifierProvider.notifier).signOut();
                     if (context.mounted) {
                       Navigator.pushAndRemoveUntil(
                         context,
                         MaterialPageRoute(
-                            builder: (_) =>
-                                const WelcomeScreen()),
+                          builder: (_) => const WelcomeScreen(),
+                        ),
                         (route) => false,
                       );
                     }
                   },
                   style: OutlinedButton.styleFrom(
                     minimumSize: const Size(double.infinity, 56),
-                    side:
-                        const BorderSide(color: AppColors.danger),
+                    side: const BorderSide(color: AppColors.danger),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
@@ -259,17 +236,15 @@ class _StatCard extends StatelessWidget {
           children: [
             Text(
               value,
-              style: Theme.of(context)
-                  .textTheme
-                  .headlineMedium
-                  ?.copyWith(color: color),
+              style: Theme.of(
+                context,
+              ).textTheme.headlineMedium?.copyWith(color: color),
             ),
             Text(
               label,
-              style: Theme.of(context)
-                  .textTheme
-                  .bodyMedium
-                  ?.copyWith(fontSize: 11, letterSpacing: 1),
+              style: Theme.of(
+                context,
+              ).textTheme.bodyMedium?.copyWith(fontSize: 11, letterSpacing: 1),
             ),
           ],
         ),
@@ -300,8 +275,7 @@ class _ProfileMenuItem extends StatelessWidget {
         decoration: BoxDecoration(
           color: AppColors.surface,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-              color: AppColors.primary.withOpacity(0.2)),
+          border: Border.all(color: AppColors.primary.withOpacity(0.2)),
         ),
         child: Row(
           children: [
@@ -311,21 +285,16 @@ class _ProfileMenuItem extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    label,
-                    style:
-                        Theme.of(context).textTheme.titleLarge,
-                  ),
-                  Text(
-                    subtitle,
-                    style:
-                        Theme.of(context).textTheme.bodyMedium,
-                  ),
+                  Text(label, style: Theme.of(context).textTheme.titleLarge),
+                  Text(subtitle, style: Theme.of(context).textTheme.bodyMedium),
                 ],
               ),
             ),
-            const Icon(Icons.arrow_forward_ios,
-                color: AppColors.textMuted, size: 16),
+            const Icon(
+              Icons.arrow_forward_ios,
+              color: AppColors.textMuted,
+              size: 16,
+            ),
           ],
         ),
       ),

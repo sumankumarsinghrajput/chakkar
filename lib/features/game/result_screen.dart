@@ -4,6 +4,8 @@ import '../../shared/services/audio_manager.dart';
 import 'game_models.dart';
 import '../home/home_screen.dart';
 import 'category_screen.dart';
+import '../match_history/match_provider.dart';
+import '../match_history/match_model.dart';
 
 class ResultScreen extends StatefulWidget {
   final GameResult result;
@@ -20,6 +22,7 @@ class _ResultScreenState extends State<ResultScreen> {
   @override
   void initState() {
     super.initState();
+    _saveMatch();
     Future.delayed(const Duration(milliseconds: 800), () {
       if (!mounted) return;
       if (result.accuracy >= 60) {
@@ -28,6 +31,19 @@ class _ResultScreenState extends State<ResultScreen> {
         audioManager.playLose();
       }
     });
+  }
+
+  void _saveMatch() {
+    saveMatchRecord(
+      mode: MatchMode.single,
+      category: result.category.toString(),
+      difficulty: result.difficulty.toString(),
+      score: result.score,
+      correct: result.correct,
+      wrong: result.wrong,
+      total: result.total,
+      isWin: result.accuracy >= 60,
+    );
   }
 
   final List<String> _loseMessages = [

@@ -8,6 +8,8 @@ import '../multiplayer/multiplayer_menu_screen.dart';
 import '../leaderboard/leaderboard_screen.dart';
 import '../achievements/achievements_screen.dart';
 import '../profile/profile_screen.dart';
+import '../friends/friends_screen.dart';
+import '../match_history/match_history_screen.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -100,7 +102,7 @@ class HomeScreen extends ConsumerWidget {
           ),
         ),
       ),
-      bottomNavigationBar: _BottomNav(),
+      bottomNavigationBar: _BottomNav(context: context),
     );
   }
 }
@@ -116,10 +118,19 @@ class _TopBar extends StatelessWidget {
       child: Row(
         children: [
           // Avatar
-          AvatarWidget(
-            avatarId: user?.avatarId ?? 'male_1',
-            size: 44,
-            showBorder: true,
+          // Avatar
+          GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const ProfileScreen()),
+              );
+            },
+            child: AvatarWidget(
+              avatarId: user?.avatarId ?? 'male_1',
+              size: 44,
+              showBorder: true,
+            ),
           ),
           const SizedBox(width: 10),
           // Username & Level
@@ -168,15 +179,26 @@ class _TopBar extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 8),
-          // Settings
+          // Friends
           IconButton(
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (_) => const LeaderboardScreen()),
+                MaterialPageRoute(builder: (_) => const FriendsScreen()),
               );
             },
-            icon: const Icon(Icons.leaderboard, color: AppColors.textSecondary),
+            icon: const Icon(
+              Icons.people_outline,
+              color: AppColors.textSecondary,
+            ),
+          ),
+          // Settings
+          IconButton(
+            onPressed: () {},
+            icon: const Icon(
+              Icons.settings_outlined,
+              color: AppColors.textSecondary,
+            ),
           ),
         ],
       ),
@@ -301,8 +323,11 @@ class _MenuCard extends StatelessWidget {
 }
 
 class _BottomNav extends StatelessWidget {
+  const _BottomNav({required this.context});
+  final BuildContext context;
+
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext _) {
     return Container(
       height: 64,
       decoration: BoxDecoration(
@@ -314,17 +339,25 @@ class _BottomNav extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          _NavItem(icon: Icons.home, label: 'Home', active: true),
+          const _NavItem(icon: Icons.home, label: 'Home', active: true),
+          _NavItem(icon: Icons.card_giftcard, label: 'Rewards', onTap: () {}),
           _NavItem(
-            icon: Icons.person,
-            label: 'Profile',
+            icon: Icons.history,
+            label: 'History',
             onTap: () => Navigator.push(
               context,
-              MaterialPageRoute(builder: (_) => const ProfileScreen()),
+              MaterialPageRoute(builder: (_) => const MatchHistoryScreen()),
             ),
           ),
-          _NavItem(icon: Icons.card_giftcard, label: 'Rewards'),
-          _NavItem(icon: Icons.storefront, label: 'Shop'),
+          _NavItem(
+            icon: Icons.leaderboard,
+            label: 'Ranks',
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const LeaderboardScreen()),
+            ),
+          ),
+          _NavItem(icon: Icons.storefront, label: 'Shop', onTap: () {}),
         ],
       ),
     );

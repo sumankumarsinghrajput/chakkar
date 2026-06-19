@@ -7,9 +7,10 @@ import '../home/home_screen.dart';
 import 'lobby_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'share_card_screen.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import '../match_history/match_provider.dart';
+import '../match_history/match_model.dart';
 
-class MultiplayerResultScreen extends StatelessWidget {
+class MultiplayerResultScreen extends StatefulWidget {
   final Map<String, int> scores;
   final List<RoomPlayer> players;
   final String roomId;
@@ -20,6 +21,49 @@ class MultiplayerResultScreen extends StatelessWidget {
     required this.players,
     required this.roomId,
   });
+
+  @override
+  State<MultiplayerResultScreen> createState() =>
+      _MultiplayerResultScreenState();
+}
+
+class _MultiplayerResultScreenState extends State<MultiplayerResultScreen> {
+  Map<String, int> get scores => widget.scores;
+  List<RoomPlayer> get players => widget.players;
+  String get roomId => widget.roomId;
+  bool _saved = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _saveMatch();
+  }
+
+  void _saveMatch() {
+    if (_saved) return;
+    _saved = true;
+
+    final currentUid = FirebaseAuth.instance.currentUser?.uid;
+    final ranked = _rankedPlayers;
+    final myEntry = ranked.firstWhere(
+      (e) => e.key.uid == currentUid,
+      orElse: () => ranked.first,
+    );
+    final myRank = ranked.indexOf(myEntry) + 1;
+
+    saveMatchRecord(
+      mode: MatchMode.multiplayer,
+      category: 'GameCategory.brainTrap',
+      difficulty: 'Difficulty.easy',
+      score: myEntry.value,
+      correct: 0,
+      wrong: 0,
+      total: 0,
+      isWin: myRank == 1,
+      rank: myRank,
+      totalPlayers: players.length,
+    );
+  }
 
   List<MapEntry<RoomPlayer, int>> get _rankedPlayers {
     final playerScores = players.map((p) {

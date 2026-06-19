@@ -108,10 +108,12 @@ class _GameplayScreenState extends ConsumerState<GameplayScreen> {
                 children: [
                   AnimatedContainer(
                     duration: const Duration(milliseconds: 300),
-                    padding: EdgeInsets.symmetric(
-                      horizontal: gameState.timeLeft <= 5 ? 20 : 16,
-                      vertical: gameState.timeLeft <= 5 ? 10 : 8,
+                    width: 95,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 8,
                     ),
+                    alignment: Alignment.center,
                     decoration: BoxDecoration(
                       color: gameState.timeLeft <= 5
                           ? AppColors.danger.withOpacity(0.3)
@@ -124,6 +126,7 @@ class _GameplayScreenState extends ConsumerState<GameplayScreen> {
                       ),
                     ),
                     child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Icon(
                           Icons.timer,
@@ -133,14 +136,20 @@ class _GameplayScreenState extends ConsumerState<GameplayScreen> {
                           size: 18,
                         ),
                         const SizedBox(width: 4),
-                        Text(
-                          '${gameState.timeLeft}s',
-                          style: Theme.of(context).textTheme.titleLarge
-                              ?.copyWith(
-                                color: gameState.timeLeft <= 5
-                                    ? AppColors.danger
-                                    : AppColors.primary,
-                              ),
+                        SizedBox(
+                          width: 32,
+                          child: Text(
+                            '${gameState.timeLeft}s',
+                            maxLines: 1,
+                            softWrap: false,
+                            overflow: TextOverflow.visible,
+                            style: Theme.of(context).textTheme.titleLarge
+                                ?.copyWith(
+                                  color: gameState.timeLeft <= 5
+                                      ? AppColors.danger
+                                      : AppColors.primary,
+                                ),
+                          ),
                         ),
                       ],
                     ),

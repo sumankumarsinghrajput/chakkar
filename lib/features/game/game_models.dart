@@ -1,19 +1,6 @@
-enum GameCategory {
-  brainTrap,
-  memory,
-  reaction,
-  visual,
-  logic,
-  focus,
-}
+enum GameCategory { brainTrap, memory, reaction, visual, logic, focus }
 
-enum Difficulty {
-  easy,
-  medium,
-  hard,
-  expert,
-  insane,
-}
+enum Difficulty { easy, medium, hard, expert, insane }
 
 extension GameCategoryExt on GameCategory {
   String get title {
@@ -89,13 +76,13 @@ extension DifficultyExt on Difficulty {
       case Difficulty.easy:
         return 30;
       case Difficulty.medium:
-        return 20;
+        return 25;
       case Difficulty.hard:
-        return 15;
+        return 20;
       case Difficulty.expert:
-        return 10;
+        return 18;
       case Difficulty.insane:
-        return 5;
+        return 15;
     }
   }
 

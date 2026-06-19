@@ -30,11 +30,21 @@ class _ResultScreenState extends State<ResultScreen> {
     });
   }
 
+  final List<String> _loseMessages = [
+    'Kuch toh sharam karo,\nisse jyada sahi answers\nmera kutta de dega!',
+    'Dimaag ghar pe\nbhool aaye kya?',
+    'Brain.exe has\nstopped working!',
+    'Itna bura? Tumhare\nbhagwan bhi naraz\nhoga aaj!',
+    'Yeh result dekh ke\nmaa-baap rone lage\nhonge!',
+    'Bhai tu khel\nraha tha ya so\nraha tha?',
+  ];
+
   String get _title {
     if (result.accuracy >= 80) return 'BRAIN MASTER!';
     if (result.accuracy >= 60) return 'WELL DONE!';
     if (result.accuracy >= 40) return 'KEEP TRYING!';
-    return 'BRAIN RESTART\nREQUIRED!';
+    final random = result.score % _loseMessages.length;
+    return _loseMessages[random];
   }
 
   Color get _titleColor {

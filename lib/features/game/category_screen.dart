@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../core/constants/app_colors.dart';
 import 'game_models.dart';
 import 'difficulty_screen.dart';
+import '../visual_game/visual_game_screen.dart';
 
 class CategoryScreen extends StatelessWidget {
   const CategoryScreen({super.key});
@@ -80,12 +81,19 @@ class _CategoryCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => DifficultyScreen(category: category),
-          ),
-        );
+        if (category == GameCategory.visual) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const VisualGameScreen()),
+          );
+        } else {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => DifficultyScreen(category: category),
+            ),
+          );
+        }
       },
       child: Container(
         decoration: BoxDecoration(
@@ -108,17 +116,17 @@ class _CategoryCard extends StatelessWidget {
             const SizedBox(height: 10),
             Text(
               category.title,
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    color: AppColors.textPrimary,
-                  ),
+              style: Theme.of(
+                context,
+              ).textTheme.titleLarge?.copyWith(color: AppColors.textPrimary),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 4),
             Text(
               category.subtitle,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    fontSize: 11,
-                  ),
+              style: Theme.of(
+                context,
+              ).textTheme.bodyMedium?.copyWith(fontSize: 11),
               textAlign: TextAlign.center,
             ),
           ],

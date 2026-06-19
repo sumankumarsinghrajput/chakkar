@@ -31,12 +31,12 @@ class _ResultScreenState extends State<ResultScreen> {
   }
 
   final List<String> _loseMessages = [
-    'Kuch toh sharam karo,\nisse jyada sahi answers\nmera kutta de dega!',
+    'Mera kutta bhi\nbehtar khelta hai!',
     'Dimaag ghar pe\nbhool aaye kya?',
-    'Brain.exe has\nstopped working!',
-    'Itna bura? Tumhare\nbhagwan bhi naraz\nhoga aaj!',
-    'Yeh result dekh ke\nmaa-baap rone lage\nhonge!',
-    'Bhai tu khel\nraha tha ya so\nraha tha?',
+    'Brain.exe stopped\nworking!',
+    'Bhagwan bhi naraz\nhonge aaj!',
+    'Maa-baap rone\nlage honge!',
+    'Tu khel raha tha\nya so raha tha?',
   ];
 
   String get _title {
@@ -59,7 +59,7 @@ class _ResultScreenState extends State<ResultScreen> {
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SafeArea(
-        child: Padding(
+        child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
           child: Column(
             children: [
@@ -68,8 +68,9 @@ class _ResultScreenState extends State<ResultScreen> {
                 _title,
                 style: Theme.of(
                   context,
-                ).textTheme.displayMedium?.copyWith(color: _titleColor),
+                ).textTheme.headlineLarge?.copyWith(color: _titleColor),
                 textAlign: TextAlign.center,
+                maxLines: 2,
               ),
               const SizedBox(height: 32),
               // Score Card
@@ -147,7 +148,7 @@ class _ResultScreenState extends State<ResultScreen> {
                   ],
                 ),
               ),
-              const Spacer(),
+              const SizedBox(height: 24),
               ElevatedButton(
                 onPressed: () {
                   Navigator.pushReplacement(

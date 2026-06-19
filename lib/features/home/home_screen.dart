@@ -10,6 +10,7 @@ import '../achievements/achievements_screen.dart';
 import '../profile/profile_screen.dart';
 import '../friends/friends_screen.dart';
 import '../match_history/match_history_screen.dart';
+import '../store/store_screen.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -91,7 +92,14 @@ class HomeScreen extends ConsumerWidget {
                         gradient: const LinearGradient(
                           colors: [Color(0xFF065F46), Color(0xFF10B981)],
                         ),
-                        onTap: () {},
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const StoreScreen(),
+                            ),
+                          );
+                        },
                       ),
                       const SizedBox(height: 80),
                     ],
@@ -357,7 +365,14 @@ class _BottomNav extends StatelessWidget {
               MaterialPageRoute(builder: (_) => const LeaderboardScreen()),
             ),
           ),
-          _NavItem(icon: Icons.storefront, label: 'Shop', onTap: () {}),
+          _NavItem(
+            icon: Icons.storefront,
+            label: 'Shop',
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const StoreScreen()),
+            ),
+          ),
         ],
       ),
     );

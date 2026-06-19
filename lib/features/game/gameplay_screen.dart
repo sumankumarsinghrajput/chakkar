@@ -5,6 +5,7 @@ import 'game_models.dart';
 import 'game_provider.dart';
 import 'result_screen.dart';
 import '../../shared/services/audio_manager.dart';
+import '../store/store_provider.dart';
 
 class GameplayScreen extends ConsumerStatefulWidget {
   final List<Question> questions;
@@ -42,7 +43,6 @@ class _GameplayScreenState extends ConsumerState<GameplayScreen> {
     final gameState = ref.watch(gameProvider(_params));
     final notifier = ref.read(gameProvider(_params).notifier);
 
-    // Play countdown sound once when timer hits 5
     if (gameState.timeLeft == 5 && _lastTimeLeft != 5 && !gameState.answered) {
       _lastTimeLeft = 5;
       audioManager.playCountdown();
@@ -180,7 +180,9 @@ class _GameplayScreenState extends ConsumerState<GameplayScreen> {
                   ),
                 ],
               ),
-              const SizedBox(height: 32),
+              const SizedBox(height: 12),
+              _BoosterBar(notifier: notifier),
+              const SizedBox(height: 12),
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.all(24),
@@ -288,6 +290,107 @@ class _OptionButton extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+class _BoosterBar extends ConsumerWidget {
+  final GameNotifier notifier;
+  const _BoosterBar({required this.notifier});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final inventoryAsync = ref.watch(ownedItemsProvider);
+
+    return inventoryAsync.when(
+      loading: () => const SizedBox(height: 40),
+      error: (_, __) => const SizedBox(height: 40),
+      data: (inventory) {
+        final List<(String, IconData, String)> boosters = [
+          ('extra_time_5', Icons.timer, '+5s'),
+          ('double_points', Icons.looks_two, '2x'),
+          ('streak_shield', Icons.shield, 'Shield'),
+          ('skip_question', Icons.skip_next, 'Skip'),
+        ];
+        final available = boosters
+            .where((b) => (inventory[b.$1] ?? 0) > 0)
+            .toList();
+
+        if (available.isEmpty) return const SizedBox(height: 4);
+
+        return SizedBox(
+          height: 44,
+          child: ListView(
+            scrollDirection: Axis.horizontal,
+            children: available.map((b) {
+              final qty = inventory[b.$1] ?? 0;
+              return Padding(
+                padding: const EdgeInsets.only(right: 8),
+                child: GestureDetector(
+                  onTap: () async {
+                    await ref
+                        .read(storeNotifierProvider.notifier)
+                        .useBooster(b.$1);
+                    notifier.applyBooster(b.$1);
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('${b.$3} booster used!'),
+                          duration: const Duration(seconds: 1),
+                          backgroundColor: AppColors.success,
+                        ),
+                      );
+                    }
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 8,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColors.surface,
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(
+                        color: AppColors.primary.withOpacity(0.4),
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(b.$2, color: AppColors.primary, size: 16),
+                        const SizedBox(width: 4),
+                        Text(
+                          b.$3,
+                          style: const TextStyle(
+                            color: AppColors.primary,
+                            fontFamily: 'Rajdhani',
+                            fontSize: 12,
+                          ),
+                        ),
+                        const SizedBox(width: 4),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 5),
+                          decoration: BoxDecoration(
+                            color: AppColors.primary.withOpacity(0.2),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Text(
+                            '$qty',
+                            style: const TextStyle(
+                              color: AppColors.primary,
+                              fontSize: 10,
+                              fontFamily: 'Rajdhani',
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            }).toList(),
+          ),
+        );
+      },
     );
   }
 }

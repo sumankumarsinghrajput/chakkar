@@ -6,7 +6,7 @@ import '../../shared/services/audio_manager.dart';
 // Sample questions database
 // Sample questions database — Hindi/Hinglish Brain Trap riddles
 final List<Question> _allQuestions = [
-    Question(
+  Question(
     id: 'ea_1',
     question: 'Second wale ko overtake karo, tum kya banoge?',
     options: ['First', 'Second', 'Third', 'Last'],
@@ -54,7 +54,12 @@ final List<Question> _allQuestions = [
   Question(
     id: 'ea_6',
     question: 'River Bank mein paise kyu nahi milte?',
-    options: ['Closed hai', 'Yeh nadi ka kinara hai', 'Cheap hai', 'Galat bank'],
+    options: [
+      'Closed hai',
+      'Yeh nadi ka kinara hai',
+      'Cheap hai',
+      'Galat bank',
+    ],
     correctIndex: 1,
     explanation: 'River bank nadi ka kinara hota hai!',
     category: GameCategory.brainTrap,
@@ -63,7 +68,12 @@ final List<Question> _allQuestions = [
   Question(
     id: 'ea_7',
     question: 'World Cup kyu nahi piya ja sakta?',
-    options: ['Bahut bada', 'Trophy hai, drink nahi', 'Kadwa hai', 'Mehnga hai'],
+    options: [
+      'Bahut bada',
+      'Trophy hai, drink nahi',
+      'Kadwa hai',
+      'Mehnga hai',
+    ],
     correctIndex: 1,
     explanation: 'World Cup ek trophy hai!',
     category: GameCategory.brainTrap,
@@ -783,7 +793,12 @@ final List<Question> _allQuestions = [
   Question(
     id: 'ha_17',
     question: 'Seedhi se 5th, lift se 1st, kyu?',
-    options: ['Exercise ke liye', 'Button nahi pahunchta', 'Lift kharab', 'Pasand hai'],
+    options: [
+      'Exercise ke liye',
+      'Button nahi pahunchta',
+      'Lift kharab',
+      'Pasand hai',
+    ],
     correctIndex: 1,
     explanation: 'Chhota hai, button nahi pahunchta!',
     category: GameCategory.brainTrap,
@@ -891,7 +906,12 @@ final List<Question> _allQuestions = [
   Question(
     id: 'ha_29',
     question: 'Ladki bhai se bada, bhai khud ko bada bole?',
-    options: ['Bhai jhooth', 'Twins, bhai pehle paida', 'Ladki choti', 'Confusion'],
+    options: [
+      'Bhai jhooth',
+      'Twins, bhai pehle paida',
+      'Ladki choti',
+      'Confusion',
+    ],
     correctIndex: 1,
     explanation: 'Twins, bhai kuch minute pehle!',
     category: GameCategory.brainTrap,
@@ -981,7 +1001,12 @@ final List<Question> _allQuestions = [
   Question(
     id: 'ex_4',
     question: 'Apne hi ghar mein chor pakda gaya?',
-    options: ['Khud chor tha', 'Dusre ghar gaya', 'Sapna tha', 'Police bula li'],
+    options: [
+      'Khud chor tha',
+      'Dusre ghar gaya',
+      'Sapna tha',
+      'Police bula li',
+    ],
     correctIndex: 0,
     explanation: 'Khud kisi aur ke ghar gaya tha!',
     category: GameCategory.brainTrap,
@@ -1035,7 +1060,12 @@ final List<Question> _allQuestions = [
   Question(
     id: 'ex_10',
     question: '2 guards, ek sach ek jhooth. Konsa sawal?',
-    options: ['Dono se pucho', 'Jhoothe se ulta pucho', 'Sikka uchhalo', 'Pata nahi'],
+    options: [
+      'Dono se pucho',
+      'Jhoothe se ulta pucho',
+      'Sikka uchhalo',
+      'Pata nahi',
+    ],
     correctIndex: 1,
     explanation: 'Jhoothe se pucho, ulta jawab milega!',
     category: GameCategory.brainTrap,
@@ -1053,7 +1083,12 @@ final List<Question> _allQuestions = [
   Question(
     id: 'ex_12',
     question: 'Hotel bill split, 1 rupaya kahan gaya?',
-    options: ['Manager le gaya', 'Galat tarika jodne ka', 'Bellboy chupaya', 'Sab sahi'],
+    options: [
+      'Manager le gaya',
+      'Galat tarika jodne ka',
+      'Bellboy chupaya',
+      'Sab sahi',
+    ],
     correctIndex: 1,
     explanation: 'Math trick - galat addition!',
     category: GameCategory.brainTrap,
@@ -1089,7 +1124,12 @@ final List<Question> _allQuestions = [
   Question(
     id: 'ex_16',
     question: 'Doobne wala bach gaya, bachane wala doob gaya?',
-    options: ['Expert nahi tha', 'Doobne wala tairna jaanta tha', 'Confusion', 'Dono bache'],
+    options: [
+      'Expert nahi tha',
+      'Doobne wala tairna jaanta tha',
+      'Confusion',
+      'Dono bache',
+    ],
     correctIndex: 1,
     explanation: 'Twist - usse tairna aata tha!',
     category: GameCategory.brainTrap,
@@ -1143,7 +1183,12 @@ final List<Question> _allQuestions = [
   Question(
     id: 'ex_22',
     question: 'Earth ghoomna band kare, pehle kya hoga?',
-    options: ['Sab girenge', 'Atmosphere udd jayega', 'Raat-din rukenge', 'Same rahega'],
+    options: [
+      'Sab girenge',
+      'Atmosphere udd jayega',
+      'Raat-din rukenge',
+      'Same rahega',
+    ],
     correctIndex: 1,
     explanation: 'Spin se atmosphere bhi ghoomti!',
     category: GameCategory.brainTrap,
@@ -1269,7 +1314,12 @@ final List<Question> _allQuestions = [
   Question(
     id: 'in_1',
     question: '3 darwaze, jhoothe guard se ek hi sawal?',
-    options: ['Safe darwaza kaunsa', 'Dusra guard kya kahega', 'Sher kahan', 'Aag kahan'],
+    options: [
+      'Safe darwaza kaunsa',
+      'Dusra guard kya kahega',
+      'Sher kahan',
+      'Aag kahan',
+    ],
     correctIndex: 1,
     explanation: 'Ulta jawab milega!',
     category: GameCategory.brainTrap,
@@ -1278,7 +1328,12 @@ final List<Question> _allQuestions = [
   Question(
     id: 'in_2',
     question: '2 tribes, ek sach ek jhooth - kaise pehchanno?',
-    options: ['Tum kis tribe se ho', 'Tum sach bolne wale ho kya kahoge', 'Doosra kahan hai', 'Jhooth bolte ho'],
+    options: [
+      'Tum kis tribe se ho',
+      'Tum sach bolne wale ho kya kahoge',
+      'Doosra kahan hai',
+      'Jhooth bolte ho',
+    ],
     correctIndex: 1,
     explanation: 'Dono se haan jawab milega!',
     category: GameCategory.brainTrap,
@@ -1305,7 +1360,12 @@ final List<Question> _allQuestions = [
   Question(
     id: 'in_5',
     question: 'Statement khud kahe main galat hoon - kya hoga?',
-    options: ['Galat banega', 'Sach banega', 'Paradox - dono nahi', 'Matlab nahi'],
+    options: [
+      'Galat banega',
+      'Sach banega',
+      'Paradox - dono nahi',
+      'Matlab nahi',
+    ],
     correctIndex: 2,
     explanation: 'Liar paradox - kabhi consistent nahi!',
     category: GameCategory.brainTrap,
@@ -1323,7 +1383,12 @@ final List<Question> _allQuestions = [
   Question(
     id: 'in_7',
     question: 'Future se khud milo, kya naya bolega?',
-    options: ['Kuch nahi, paradox hoga', 'Predict karega', 'Sab kuch', 'Milna impossible'],
+    options: [
+      'Kuch nahi, paradox hoga',
+      'Predict karega',
+      'Sab kuch',
+      'Milna impossible',
+    ],
     correctIndex: 0,
     explanation: 'Causality violate hogi!',
     category: GameCategory.brainTrap,
@@ -1332,7 +1397,12 @@ final List<Question> _allQuestions = [
   Question(
     id: 'in_8',
     question: '3 darwaze, car ek mein, switch karna chahiye?',
-    options: ['Nahi', 'Haan, chance badhta hai', 'Farak nahi', 'Luck pe depend'],
+    options: [
+      'Nahi',
+      'Haan, chance badhta hai',
+      'Farak nahi',
+      'Luck pe depend',
+    ],
     correctIndex: 1,
     explanation: 'Monty Hall - 2/3 chance!',
     category: GameCategory.brainTrap,
@@ -1341,7 +1411,12 @@ final List<Question> _allQuestions = [
   Question(
     id: 'in_9',
     question: 'Infinite universe mein, infinite versions of tum?',
-    options: ['Nahi possible', 'Theoretically haan', 'Sirf ek tum', 'Pata nahi'],
+    options: [
+      'Nahi possible',
+      'Theoretically haan',
+      'Sirf ek tum',
+      'Pata nahi',
+    ],
     correctIndex: 1,
     explanation: 'Multiverse theory!',
     category: GameCategory.brainTrap,
@@ -1359,7 +1434,12 @@ final List<Question> _allQuestions = [
   Question(
     id: 'in_11',
     question: 'Robot tumhare jaisa soche, woh tum ho?',
-    options: ['Tum ho', 'Alag entity', 'Philosophical debate', 'Robot soch nahi sakta'],
+    options: [
+      'Tum ho',
+      'Alag entity',
+      'Philosophical debate',
+      'Robot soch nahi sakta',
+    ],
     correctIndex: 2,
     explanation: 'Consciousness ka deep sawal!',
     category: GameCategory.brainTrap,
@@ -1368,7 +1448,12 @@ final List<Question> _allQuestions = [
   Question(
     id: 'in_12',
     question: 'Particles door hote hue connected kaise?',
-    options: ['Magic hai', 'Spooky action at distance', 'Light se fast info', 'Fake hai'],
+    options: [
+      'Magic hai',
+      'Spooky action at distance',
+      'Light se fast info',
+      'Fake hai',
+    ],
     correctIndex: 1,
     explanation: 'Einstein bhi confused tha isse!',
     category: GameCategory.brainTrap,
@@ -1377,7 +1462,12 @@ final List<Question> _allQuestions = [
   Question(
     id: 'in_13',
     question: 'Black hole mein gir jao, time kaisa lagega?',
-    options: ['Same', 'Tumhe normal, bahar freeze dikhega', 'Gayab ho jaoge', 'Reverse hoga'],
+    options: [
+      'Same',
+      'Tumhe normal, bahar freeze dikhega',
+      'Gayab ho jaoge',
+      'Reverse hoga',
+    ],
     correctIndex: 1,
     explanation: 'Gravity time dilate karti hai!',
     category: GameCategory.brainTrap,
@@ -1386,7 +1476,12 @@ final List<Question> _allQuestions = [
   Question(
     id: 'in_14',
     question: 'Dada ko shaadi se pehle roko, kya hoga?',
-    options: ['Tum paida nahi hoge', 'Paradox banega', 'Kuch nahi', 'Naya timeline'],
+    options: [
+      'Tum paida nahi hoge',
+      'Paradox banega',
+      'Kuch nahi',
+      'Naya timeline',
+    ],
     correctIndex: 1,
     explanation: 'Grandfather paradox!',
     category: GameCategory.brainTrap,
@@ -1395,7 +1490,12 @@ final List<Question> _allQuestions = [
   Question(
     id: 'in_15',
     question: 'AI khud ko improve kare exponentially, kya hoga?',
-    options: ['Kuch nahi badlega', 'Singularity ho sakti', 'AI rukega', 'Insaan control karenge'],
+    options: [
+      'Kuch nahi badlega',
+      'Singularity ho sakti',
+      'AI rukega',
+      'Insaan control karenge',
+    ],
     correctIndex: 1,
     explanation: 'Technological Singularity theory!',
     category: GameCategory.brainTrap,
@@ -1404,7 +1504,12 @@ final List<Question> _allQuestions = [
   Question(
     id: 'in_16',
     question: 'Universe bada hai, aliens kyu nahi mile?',
-    options: ['Exist nahi karte', 'Multiple theories hain', 'Sarkar chhupa rahi', 'Bahut chhote hain'],
+    options: [
+      'Exist nahi karte',
+      'Multiple theories hain',
+      'Sarkar chhupa rahi',
+      'Bahut chhote hain',
+    ],
     correctIndex: 1,
     explanation: 'Fermi Paradox - unsolved hai!',
     category: GameCategory.brainTrap,
@@ -1413,7 +1518,12 @@ final List<Question> _allQuestions = [
   Question(
     id: 'in_17',
     question: 'Apne purane self se milo, same vyakti ho?',
-    options: ['Same', 'Identity ka philosophical debate', 'Alag vyakti', 'Paradox banega'],
+    options: [
+      'Same',
+      'Identity ka philosophical debate',
+      'Alag vyakti',
+      'Paradox banega',
+    ],
     correctIndex: 1,
     explanation: 'Personal identity over time!',
     category: GameCategory.brainTrap,
@@ -1422,7 +1532,12 @@ final List<Question> _allQuestions = [
   Question(
     id: 'in_18',
     question: 'Har decision se naya universe banta hai?',
-    options: ['Nahi, ek hi hai', 'Many-Worlds mein haan', 'Sirf badi decisions', 'Fiction hai'],
+    options: [
+      'Nahi, ek hi hai',
+      'Many-Worlds mein haan',
+      'Sirf badi decisions',
+      'Fiction hai',
+    ],
     correctIndex: 1,
     explanation: 'Quantum mechanics ki theory!',
     category: GameCategory.brainTrap,
@@ -1440,7 +1555,12 @@ final List<Question> _allQuestions = [
   Question(
     id: 'in_20',
     question: 'Sote waqt consciousness kahan jaata hai?',
-    options: ['Khatam hota', 'Science abhi explain nahi kar paayi', 'Dusri jagah jaata', 'Sapno mein'],
+    options: [
+      'Khatam hota',
+      'Science abhi explain nahi kar paayi',
+      'Dusri jagah jaata',
+      'Sapno mein',
+    ],
     correctIndex: 1,
     explanation: 'Hard Problem of Consciousness!',
     category: GameCategory.brainTrap,
@@ -1449,7 +1569,12 @@ final List<Question> _allQuestions = [
   Question(
     id: 'in_21',
     question: 'Random brain bana jo sochta real hai, prove karoge?',
-    options: ['Easy hai', 'Impossible to prove definitively', 'Sapna check karo', 'Doosron se pucho'],
+    options: [
+      'Easy hai',
+      'Impossible to prove definitively',
+      'Sapna check karo',
+      'Doosron se pucho',
+    ],
     correctIndex: 1,
     explanation: 'Boltzmann Brain thought experiment!',
     category: GameCategory.brainTrap,
@@ -1458,7 +1583,12 @@ final List<Question> _allQuestions = [
   Question(
     id: 'in_22',
     question: 'Neuron-by-neuron artificial badlo, kab tum na rahoge?',
-    options: ['Pehle neuron se', 'Clear answer nahi hai', 'Last neuron se', 'Kabhi nahi'],
+    options: [
+      'Pehle neuron se',
+      'Clear answer nahi hai',
+      'Last neuron se',
+      'Kabhi nahi',
+    ],
     correctIndex: 1,
     explanation: 'Ship of Theseus jaisa paradox!',
     category: GameCategory.brainTrap,
@@ -1467,7 +1597,12 @@ final List<Question> _allQuestions = [
   Question(
     id: 'in_23',
     question: 'Big Bang se pehle kya tha?',
-    options: ['Kuch nahi', 'Time hi shuru hua tabhi', 'Doosra universe', 'Pata nahi'],
+    options: [
+      'Kuch nahi',
+      'Time hi shuru hua tabhi',
+      'Doosra universe',
+      'Pata nahi',
+    ],
     correctIndex: 1,
     explanation: 'Time khud Big Bang se shuru!',
     category: GameCategory.brainTrap,
@@ -1476,7 +1611,12 @@ final List<Question> _allQuestions = [
   Question(
     id: 'in_24',
     question: 'Khud ko prove karo exist karte ho, kaise?',
-    options: ['Circular reasoning hai', 'Sochna hi proof hai', 'Zaroori nahi', 'Impossible hai'],
+    options: [
+      'Circular reasoning hai',
+      'Sochna hi proof hai',
+      'Zaroori nahi',
+      'Impossible hai',
+    ],
     correctIndex: 1,
     explanation: 'Descartes - I think therefore I am!',
     category: GameCategory.brainTrap,
@@ -1485,7 +1625,12 @@ final List<Question> _allQuestions = [
   Question(
     id: 'in_25',
     question: '2 parallel brahmand mein time same speed?',
-    options: ['Haan hamesha', 'Alag bhi ho sakta', 'Time hota hi nahi', 'Impossible'],
+    options: [
+      'Haan hamesha',
+      'Alag bhi ho sakta',
+      'Time hota hi nahi',
+      'Impossible',
+    ],
     correctIndex: 1,
     explanation: 'Different physics laws ho sakte!',
     category: GameCategory.brainTrap,
@@ -1494,7 +1639,12 @@ final List<Question> _allQuestions = [
   Question(
     id: 'in_26',
     question: 'Solution verify karna easy, solve karna bhi easy?',
-    options: ['Computers fast hain', 'P vs NP problem hai', 'AI insaan banega', 'Internet bada hai'],
+    options: [
+      'Computers fast hain',
+      'P vs NP problem hai',
+      'AI insaan banega',
+      'Internet bada hai',
+    ],
     correctIndex: 1,
     explanation: 'Million-dollar unsolved problem!',
     category: GameCategory.brainTrap,
@@ -1503,7 +1653,12 @@ final List<Question> _allQuestions = [
   Question(
     id: 'in_27',
     question: 'Infinite monkeys typewriter pe, Shakespeare likhenge?',
-    options: ['Kabhi nahi', 'Theoretically haan', 'Sirf insaan likh sakte', 'Depends'],
+    options: [
+      'Kabhi nahi',
+      'Theoretically haan',
+      'Sirf insaan likh sakte',
+      'Depends',
+    ],
     correctIndex: 1,
     explanation: 'Infinite Monkey Theorem!',
     category: GameCategory.brainTrap,
@@ -1512,7 +1667,12 @@ final List<Question> _allQuestions = [
   Question(
     id: 'in_28',
     question: 'Dark matter kabhi dekha nahi, pata kaise chala?',
-    options: ['Guess hai', 'Gravitational effects se infer', 'Telescope se dikhta', 'Fake hai'],
+    options: [
+      'Guess hai',
+      'Gravitational effects se infer',
+      'Telescope se dikhta',
+      'Fake hai',
+    ],
     correctIndex: 1,
     explanation: 'Galaxy rotation se evidence milta!',
     category: GameCategory.brainTrap,
@@ -1521,7 +1681,12 @@ final List<Question> _allQuestions = [
   Question(
     id: 'in_29',
     question: 'Quantum computer normal se kitna fast?',
-    options: ['Same speed', 'Exponentially fast kuch problems mein', '2x fast', 'Slower hota'],
+    options: [
+      'Same speed',
+      'Exponentially fast kuch problems mein',
+      '2x fast',
+      'Slower hota',
+    ],
     correctIndex: 1,
     explanation: 'Factorization jaisi problems mein speedup!',
     category: GameCategory.brainTrap,
@@ -1539,7 +1704,12 @@ final List<Question> _allQuestions = [
   Question(
     id: 'in_31',
     question: 'Simulation mein reh rahe ho, pata chal sakta?',
-    options: ['Haan easily', 'Prove karna mushkil hai', 'Nahi kabhi', 'Already pata hai'],
+    options: [
+      'Haan easily',
+      'Prove karna mushkil hai',
+      'Nahi kabhi',
+      'Already pata hai',
+    ],
     correctIndex: 1,
     explanation: 'Simulation Hypothesis - serious theory!',
     category: GameCategory.brainTrap,
@@ -1548,7 +1718,12 @@ final List<Question> _allQuestions = [
   Question(
     id: 'in_32',
     question: 'Universe laws aise hain ki hum exist kare?',
-    options: ['Universe humare liye bana', 'Selection bias hai', 'Religion ka concept', 'Random hai'],
+    options: [
+      'Universe humare liye bana',
+      'Selection bias hai',
+      'Religion ka concept',
+      'Random hai',
+    ],
     correctIndex: 1,
     explanation: 'Anthropic Principle!',
     category: GameCategory.brainTrap,
@@ -1566,7 +1741,12 @@ final List<Question> _allQuestions = [
   Question(
     id: 'in_34',
     question: 'Quantum mein hidden variables nahi hote, matlab?',
-    options: ['QM galat hai', 'Reality probabilistic hai', 'Predetermined hai', 'Sirf theory'],
+    options: [
+      'QM galat hai',
+      'Reality probabilistic hai',
+      'Predetermined hai',
+      'Sirf theory',
+    ],
     correctIndex: 1,
     explanation: 'Bell ke Theorem ne prove kiya!',
     category: GameCategory.brainTrap,
@@ -1575,7 +1755,12 @@ final List<Question> _allQuestions = [
   Question(
     id: 'in_35',
     question: 'Future ko message bhejo jo present change kare?',
-    options: ['Bhej diya jayega', 'Bootstrap Paradox banega', 'Impossible hai', 'Resolve hoga'],
+    options: [
+      'Bhej diya jayega',
+      'Bootstrap Paradox banega',
+      'Impossible hai',
+      'Resolve hoga',
+    ],
     correctIndex: 1,
     explanation: 'Causal loop bina origin ke!',
     category: GameCategory.brainTrap,
@@ -1678,10 +1863,62 @@ class GameState {
 class GameNotifier extends StateNotifier<GameState> {
   Timer? _timer;
   final Difficulty difficulty;
+  final int extraTime;
+  final bool doublePoints;
+  final bool streakShield;
+  bool _shieldUsed = false;
+  bool _doublePointsActive = false;
+  bool _shieldActive = false;
   final DateTime _startTime = DateTime.now();
 
-  GameNotifier({required List<Question> questions, required this.difficulty})
-    : super(GameState(questions: questions, timeLeft: difficulty.timeLimit)) {
+  GameNotifier({
+    required List<Question> questions,
+    required this.difficulty,
+    this.extraTime = 0,
+    this.doublePoints = false,
+    this.streakShield = false,
+  }) : super(
+         GameState(
+           questions: questions,
+           timeLeft: difficulty.timeLimit + extraTime,
+         ),
+       ) {
+    _startTimer();
+  }
+
+  void applyBooster(String boosterId) {
+    switch (boosterId) {
+      case 'extra_time_5':
+        if (!state.answered) {
+          state = state.copyWith(timeLeft: state.timeLeft + 5);
+        }
+        break;
+      case 'double_points':
+        _doublePointsActive = true;
+        break;
+      case 'streak_shield':
+        _shieldActive = true;
+        break;
+      case 'skip_question':
+        skipQuestion();
+        break;
+    }
+  }
+
+  void skipQuestion() {
+    if (state.answered) return;
+    _timer?.cancel();
+    // Skip without counting as correct or wrong
+    if (state.currentIndex + 1 >= state.questions.length) {
+      state = state.copyWith(isFinished: true);
+      return;
+    }
+    state = state.copyWith(
+      currentIndex: state.currentIndex + 1,
+      timeLeft: difficulty.timeLimit + extraTime,
+      answered: false,
+      selectedIndex: null,
+    );
     _startTimer();
   }
 
@@ -1706,17 +1943,23 @@ class GameNotifier extends StateNotifier<GameState> {
     final question = state.currentQuestion;
     if (question == null) return;
 
-    final isCorrect = index == question.correctIndex;
-    final points = isCorrect
+    bool isCorrect = index == question.correctIndex;
+
+    // Streak Shield: protect from ONE wrong answer
+    if (!isCorrect && _shieldActive && !_shieldUsed) {
+      _shieldUsed = true;
+      _shieldActive = false;
+      isCorrect = true;
+    }
+
+    int points = isCorrect
         ? (state.timeLeft * difficulty.pointsMultiplier * 10)
         : 0;
+    if (_doublePointsActive) points *= 2;
 
-    // Play sound
     if (isCorrect) {
-      print('Playing correct sound');
       audioManager.playCorrect();
     } else {
-      print('Playing wrong sound');
       audioManager.playWrong();
     }
 
@@ -1739,7 +1982,7 @@ class GameNotifier extends StateNotifier<GameState> {
     }
     state = state.copyWith(
       currentIndex: state.currentIndex + 1,
-      timeLeft: difficulty.timeLimit,
+      timeLeft: difficulty.timeLimit + extraTime,
       answered: false,
       selectedIndex: null,
     );
@@ -1770,6 +2013,9 @@ final gameProvider =
         return GameNotifier(
           questions: params['questions'] as List<Question>,
           difficulty: params['difficulty'] as Difficulty,
+          extraTime: params['extraTime'] as int? ?? 0,
+          doublePoints: params['doublePoints'] as bool? ?? false,
+          streakShield: params['streakShield'] as bool? ?? false,
         );
       },
     );

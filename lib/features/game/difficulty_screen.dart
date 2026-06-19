@@ -16,8 +16,7 @@ class DifficultyScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text(category.title.toUpperCase()),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios,
-              color: AppColors.textPrimary),
+          icon: const Icon(Icons.arrow_back_ios, color: AppColors.textPrimary),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -29,9 +28,9 @@ class DifficultyScreen extends StatelessWidget {
             Text(
               'SELECT DIFFICULTY',
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    letterSpacing: 3,
-                    color: AppColors.textSecondary,
-                  ),
+                letterSpacing: 3,
+                color: AppColors.textSecondary,
+              ),
             ),
             const SizedBox(height: 8),
             Text(
@@ -63,10 +62,7 @@ class _DifficultyCard extends StatelessWidget {
   final Difficulty difficulty;
   final GameCategory category;
 
-  const _DifficultyCard({
-    required this.difficulty,
-    required this.category,
-  });
+  const _DifficultyCard({required this.difficulty, required this.category});
 
   Color get _color {
     switch (difficulty) {
@@ -134,10 +130,9 @@ class _DifficultyCard extends StatelessWidget {
                 children: [
                   Text(
                     difficulty.title.toUpperCase(),
-                    style: Theme.of(context)
-                        .textTheme
-                        .titleLarge
-                        ?.copyWith(color: _color),
+                    style: Theme.of(
+                      context,
+                    ).textTheme.titleLarge?.copyWith(color: _color),
                   ),
                   Text(
                     '${difficulty.timeLimit}s per question  •  ${difficulty.pointsMultiplier}x points',

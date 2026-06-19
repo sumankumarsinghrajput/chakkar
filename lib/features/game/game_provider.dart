@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'game_models.dart';
+import '../../shared/services/audio_manager.dart';
 
 // Sample questions database
 final List<Question> _allQuestions = [
@@ -53,7 +54,8 @@ final List<Question> _allQuestions = [
   // Logic
   Question(
     id: 'lg1',
-    question: 'If all Bloops are Razzles and all Razzles are Lazzles, are all Bloops definitely Lazzles?',
+    question:
+        'If all Bloops are Razzles and all Razzles are Lazzles, are all Bloops definitely Lazzles?',
     options: ['Yes', 'No', 'Maybe', 'Cannot say'],
     correctIndex: 0,
     explanation: 'Bloops → Razzles → Lazzles, so Bloops are Lazzles!',
@@ -72,7 +74,8 @@ final List<Question> _allQuestions = [
   // Memory
   Question(
     id: 'mm1',
-    question: 'Which color appears in BOTH the Indian flag and the French flag?',
+    question:
+        'Which color appears in BOTH the Indian flag and the French flag?',
     options: ['Green', 'Orange', 'Blue', 'White'],
     correctIndex: 3,
     explanation: 'White appears in both flags!',
@@ -148,13 +151,8 @@ class GameNotifier extends StateNotifier<GameState> {
   final Difficulty difficulty;
   final DateTime _startTime = DateTime.now();
 
-  GameNotifier({
-    required List<Question> questions,
-    required this.difficulty,
-  }) : super(GameState(
-          questions: questions,
-          timeLeft: difficulty.timeLimit,
-        )) {
+  GameNotifier({required List<Question> questions, required this.difficulty})
+    : super(GameState(questions: questions, timeLeft: difficulty.timeLimit)) {
     _startTimer();
   }
 
@@ -170,10 +168,7 @@ class GameNotifier extends StateNotifier<GameState> {
   }
 
   void _timeUp() {
-    state = state.copyWith(
-      answered: true,
-      wrong: state.wrong + 1,
-    );
+    state = state.copyWith(answered: true, wrong: state.wrong + 1);
     Future.delayed(const Duration(seconds: 2), nextQuestion);
   }
 
@@ -186,6 +181,15 @@ class GameNotifier extends StateNotifier<GameState> {
     final points = isCorrect
         ? (state.timeLeft * difficulty.pointsMultiplier * 10)
         : 0;
+
+    // Play sound
+    if (isCorrect) {
+      print('Playing correct sound');
+      audioManager.playCorrect();
+    } else {
+      print('Playing wrong sound');
+      audioManager.playWrong();
+    }
 
     state = state.copyWith(
       answered: true,
@@ -232,10 +236,11 @@ class GameNotifier extends StateNotifier<GameState> {
 }
 
 final gameProvider =
-    StateNotifierProvider.family<GameNotifier, GameState,
-        Map<String, dynamic>>((ref, params) {
-  return GameNotifier(
-    questions: params['questions'] as List<Question>,
-    difficulty: params['difficulty'] as Difficulty,
-  );
-});
+    StateNotifierProvider.family<GameNotifier, GameState, Map<String, dynamic>>(
+      (ref, params) {
+        return GameNotifier(
+          questions: params['questions'] as List<Question>,
+          difficulty: params['difficulty'] as Difficulty,
+        );
+      },
+    );

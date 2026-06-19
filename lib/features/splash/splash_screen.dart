@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../core/constants/app_colors.dart';
 import '../auth/presentation/welcome_screen.dart';
+import '../../shared/services/audio_manager.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -23,15 +24,22 @@ class _SplashScreenState extends State<SplashScreen>
       duration: const Duration(milliseconds: 1500),
     );
 
-    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeIn),
-    );
+    _fadeAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeIn));
 
-    _scaleAnimation = Tween<double>(begin: 0.5, end: 1.0).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.elasticOut),
-    );
+    _scaleAnimation = Tween<double>(
+      begin: 0.5,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.elasticOut));
 
     _controller.forward();
+
+    // Test audio
+    Future.delayed(const Duration(seconds: 1), () {
+      audioManager.playCorrect();
+    });
 
     Future.delayed(const Duration(seconds: 3), () {
       if (mounted) {
@@ -87,24 +95,18 @@ class _SplashScreenState extends State<SplashScreen>
                     const SizedBox(height: 24),
                     Text(
                       'CHAKKAR',
-                      style: Theme.of(context)
-                          .textTheme
-                          .displayLarge
-                          ?.copyWith(
-                            color: AppColors.primary,
-                            letterSpacing: 8,
-                          ),
+                      style: Theme.of(context).textTheme.displayLarge?.copyWith(
+                        color: AppColors.primary,
+                        letterSpacing: 8,
+                      ),
                     ),
                     const SizedBox(height: 8),
                     Text(
                       'THE ULTIMATE BRAIN BATTLE',
-                      style: Theme.of(context)
-                          .textTheme
-                          .bodyMedium
-                          ?.copyWith(
-                            letterSpacing: 3,
-                            color: AppColors.textSecondary,
-                          ),
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        letterSpacing: 3,
+                        color: AppColors.textSecondary,
+                      ),
                     ),
                   ],
                 ),

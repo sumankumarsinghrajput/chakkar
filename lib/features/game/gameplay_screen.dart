@@ -4,6 +4,7 @@ import '../../core/constants/app_colors.dart';
 import 'game_models.dart';
 import 'game_provider.dart';
 import 'result_screen.dart';
+import '../../shared/services/audio_manager.dart';
 
 class GameplayScreen extends ConsumerStatefulWidget {
   final List<Question> questions;
@@ -23,20 +24,31 @@ class GameplayScreen extends ConsumerStatefulWidget {
 
 class _GameplayScreenState extends ConsumerState<GameplayScreen> {
   late final Map<String, dynamic> _params;
+  int _lastTimeLeft = 999;
 
   @override
   void initState() {
     super.initState();
-    _params = {
-      'questions': widget.questions,
-      'difficulty': widget.difficulty,
-    };
+    _params = {'questions': widget.questions, 'difficulty': widget.difficulty};
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final gameState = ref.watch(gameProvider(_params));
     final notifier = ref.read(gameProvider(_params).notifier);
+
+    // Play countdown sound once when timer hits 5
+    if (gameState.timeLeft == 5 && _lastTimeLeft != 5 && !gameState.answered) {
+      _lastTimeLeft = 5;
+      audioManager.playCountdown();
+    } else if (gameState.timeLeft != 5) {
+      _lastTimeLeft = gameState.timeLeft;
+    }
 
     if (gameState.isFinished) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -63,18 +75,22 @@ class _GameplayScreenState extends ConsumerState<GameplayScreen> {
                 children: [
                   IconButton(
                     onPressed: () => Navigator.pop(context),
-                    icon: const Icon(Icons.close,
-                        color: AppColors.textSecondary),
+                    icon: const Icon(
+                      Icons.close,
+                      color: AppColors.textSecondary,
+                    ),
                   ),
                   Expanded(
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(8),
                       child: LinearProgressIndicator(
-                        value: (gameState.currentIndex + 1) /
+                        value:
+                            (gameState.currentIndex + 1) /
                             gameState.questions.length,
                         backgroundColor: AppColors.surface,
                         valueColor: const AlwaysStoppedAnimation(
-                            AppColors.primary),
+                          AppColors.primary,
+                        ),
                         minHeight: 8,
                       ),
                     ),
@@ -90,12 +106,15 @@ class _GameplayScreenState extends ConsumerState<GameplayScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 8),
+                  AnimatedContainer(
+                    duration: const Duration(milliseconds: 300),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: gameState.timeLeft <= 5 ? 20 : 16,
+                      vertical: gameState.timeLeft <= 5 ? 10 : 8,
+                    ),
                     decoration: BoxDecoration(
                       color: gameState.timeLeft <= 5
-                          ? AppColors.danger.withOpacity(0.2)
+                          ? AppColors.danger.withOpacity(0.3)
                           : AppColors.surface,
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(
@@ -116,9 +135,7 @@ class _GameplayScreenState extends ConsumerState<GameplayScreen> {
                         const SizedBox(width: 4),
                         Text(
                           '${gameState.timeLeft}s',
-                          style: Theme.of(context)
-                              .textTheme
-                              .titleLarge
+                          style: Theme.of(context).textTheme.titleLarge
                               ?.copyWith(
                                 color: gameState.timeLeft <= 5
                                     ? AppColors.danger
@@ -130,15 +147,20 @@ class _GameplayScreenState extends ConsumerState<GameplayScreen> {
                   ),
                   Container(
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 8),
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
                     decoration: BoxDecoration(
                       color: AppColors.surface,
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Row(
                       children: [
-                        const Icon(Icons.star,
-                            color: Color(0xFFF59E0B), size: 18),
+                        const Icon(
+                          Icons.star,
+                          color: Color(0xFFF59E0B),
+                          size: 18,
+                        ),
                         const SizedBox(width: 4),
                         Text(
                           '${gameState.score}',
@@ -156,9 +178,7 @@ class _GameplayScreenState extends ConsumerState<GameplayScreen> {
                 decoration: BoxDecoration(
                   color: AppColors.surface,
                   borderRadius: BorderRadius.circular(20),
-                  border: Border.all(
-                    color: AppColors.primary.withOpacity(0.2),
-                  ),
+                  border: Border.all(color: AppColors.primary.withOpacity(0.2)),
                 ),
                 child: Text(
                   question.question,
@@ -169,8 +189,7 @@ class _GameplayScreenState extends ConsumerState<GameplayScreen> {
               const SizedBox(height: 24),
               Expanded(
                 child: GridView.builder(
-                  gridDelegate:
-                      const SliverGridDelegateWithFixedCrossAxisCount(
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 2,
                     crossAxisSpacing: 12,
                     mainAxisSpacing: 12,
@@ -197,10 +216,9 @@ class _GameplayScreenState extends ConsumerState<GameplayScreen> {
                   ),
                   child: Text(
                     question.explanation,
-                    style: Theme.of(context)
-                        .textTheme
-                        .bodyMedium
-                        ?.copyWith(color: AppColors.accent),
+                    style: Theme.of(
+                      context,
+                    ).textTheme.bodyMedium?.copyWith(color: AppColors.accent),
                     textAlign: TextAlign.center,
                   ),
                 ),

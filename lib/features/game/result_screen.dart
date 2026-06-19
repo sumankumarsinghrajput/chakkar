@@ -1,13 +1,34 @@
 import 'package:flutter/material.dart';
 import '../../core/constants/app_colors.dart';
+import '../../shared/services/audio_manager.dart';
 import 'game_models.dart';
 import '../home/home_screen.dart';
 import 'category_screen.dart';
 
-class ResultScreen extends StatelessWidget {
+class ResultScreen extends StatefulWidget {
   final GameResult result;
 
   const ResultScreen({super.key, required this.result});
+
+  @override
+  State<ResultScreen> createState() => _ResultScreenState();
+}
+
+class _ResultScreenState extends State<ResultScreen> {
+  GameResult get result => widget.result;
+
+  @override
+  void initState() {
+    super.initState();
+    Future.delayed(const Duration(milliseconds: 800), () {
+      if (!mounted) return;
+      if (result.accuracy >= 60) {
+        audioManager.playWin();
+      } else {
+        audioManager.playLose();
+      }
+    });
+  }
 
   String get _title {
     if (result.accuracy >= 80) return 'BRAIN MASTER!';
@@ -33,13 +54,11 @@ class ResultScreen extends StatelessWidget {
           child: Column(
             children: [
               const SizedBox(height: 24),
-              // Title
               Text(
                 _title,
-                style: Theme.of(context)
-                    .textTheme
-                    .displayMedium
-                    ?.copyWith(color: _titleColor),
+                style: Theme.of(
+                  context,
+                ).textTheme.displayMedium?.copyWith(color: _titleColor),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 32),
@@ -50,30 +69,25 @@ class ResultScreen extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: AppColors.surface,
                   borderRadius: BorderRadius.circular(20),
-                  border: Border.all(
-                    color: AppColors.primary.withOpacity(0.3),
-                  ),
+                  border: Border.all(color: AppColors.primary.withOpacity(0.3)),
                 ),
                 child: Column(
                   children: [
                     Text(
                       '${result.score}',
-                      style: Theme.of(context)
-                          .textTheme
-                          .displayLarge
-                          ?.copyWith(color: AppColors.primary),
+                      style: Theme.of(context).textTheme.displayLarge?.copyWith(
+                        color: AppColors.primary,
+                      ),
                     ),
                     Text(
                       'TOTAL SCORE',
-                      style: Theme.of(context)
-                          .textTheme
-                          .bodyMedium
-                          ?.copyWith(letterSpacing: 3),
+                      style: Theme.of(
+                        context,
+                      ).textTheme.bodyMedium?.copyWith(letterSpacing: 3),
                     ),
                     const SizedBox(height: 24),
                     Row(
-                      mainAxisAlignment:
-                          MainAxisAlignment.spaceAround,
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
                         _StatItem(
                           label: 'CORRECT',
@@ -87,8 +101,7 @@ class ResultScreen extends StatelessWidget {
                         ),
                         _StatItem(
                           label: 'ACCURACY',
-                          value:
-                              '${result.accuracy.toStringAsFixed(0)}%',
+                          value: '${result.accuracy.toStringAsFixed(0)}%',
                           color: AppColors.accent,
                         ),
                       ],
@@ -97,7 +110,6 @@ class ResultScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 16),
-              // Difficulty & Category
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
@@ -119,22 +131,18 @@ class ResultScreen extends StatelessWidget {
                     ),
                     _StatItem(
                       label: 'TIME',
-                      value:
-                          '${result.timeTaken.inSeconds}s',
+                      value: '${result.timeTaken.inSeconds}s',
                       color: const Color(0xFFF59E0B),
                     ),
                   ],
                 ),
               ),
               const Spacer(),
-              // Buttons
               ElevatedButton(
                 onPressed: () {
                   Navigator.pushReplacement(
                     context,
-                    MaterialPageRoute(
-                      builder: (_) => const CategoryScreen(),
-                    ),
+                    MaterialPageRoute(builder: (_) => const CategoryScreen()),
                   );
                 },
                 child: const Text('PLAY AGAIN'),
@@ -144,8 +152,7 @@ class ResultScreen extends StatelessWidget {
                 onPressed: () {
                   Navigator.pushAndRemoveUntil(
                     context,
-                    MaterialPageRoute(
-                        builder: (_) => const HomeScreen()),
+                    MaterialPageRoute(builder: (_) => const HomeScreen()),
                     (route) => false,
                   );
                 },
@@ -187,17 +194,15 @@ class _StatItem extends StatelessWidget {
       children: [
         Text(
           value,
-          style: Theme.of(context)
-              .textTheme
-              .headlineMedium
-              ?.copyWith(color: color),
+          style: Theme.of(
+            context,
+          ).textTheme.headlineMedium?.copyWith(color: color),
         ),
         Text(
           label,
-          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                fontSize: 11,
-                letterSpacing: 1,
-              ),
+          style: Theme.of(
+            context,
+          ).textTheme.bodyMedium?.copyWith(fontSize: 11, letterSpacing: 1),
         ),
       ],
     );

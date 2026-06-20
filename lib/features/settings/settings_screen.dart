@@ -14,6 +14,7 @@ class SettingsScreen extends ConsumerStatefulWidget {
 
 class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   bool _soundEnabled = audioManager.soundEnabled;
+  bool _vibrationEnabled = audioManager.vibrationEnabled;
 
   @override
   Widget build(BuildContext context) {
@@ -41,6 +42,21 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 setState(() {
                   _soundEnabled = v;
                   audioManager.toggleSound();
+                });
+              },
+            ),
+          ),
+          _SettingsTile(
+            icon: Icons.vibration,
+            title: 'Vibration',
+            subtitle: 'Vibrate on wrong answers',
+            trailing: Switch(
+              value: _vibrationEnabled,
+              activeColor: AppColors.primary,
+              onChanged: (v) {
+                setState(() {
+                  _vibrationEnabled = v;
+                  audioManager.toggleVibration();
                 });
               },
             ),
@@ -98,7 +114,9 @@ class _SectionTitle extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 8, left: 4),
       child: Text(
         title,
-        style: Theme.of(context).textTheme.bodyMedium?.copyWith(letterSpacing: 2),
+        style: Theme.of(
+          context,
+        ).textTheme.bodyMedium?.copyWith(letterSpacing: 2),
       ),
     );
   }
@@ -141,7 +159,10 @@ class _SettingsTile extends StatelessWidget {
                 children: [
                   Text(title, style: Theme.of(context).textTheme.titleLarge),
                   if (subtitle != null)
-                    Text(subtitle!, style: Theme.of(context).textTheme.bodyMedium),
+                    Text(
+                      subtitle!,
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
                 ],
               ),
             ),

@@ -1961,6 +1961,7 @@ class GameNotifier extends StateNotifier<GameState> {
       audioManager.playCorrect();
     } else {
       audioManager.playWrong();
+      audioManager.vibrateWrong();
     }
 
     state = state.copyWith(

@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:vibration/vibration.dart';
 
 class AudioManager {
   static final AudioManager _instance = AudioManager._internal();
@@ -12,11 +13,34 @@ class AudioManager {
   final AudioPlayer _player = AudioPlayer();
   bool _soundEnabled = true;
   bool _memeEnabled = true;
+  bool _vibrationEnabled = true;
   String _audioTier = 'standard'; // 'standard' or 'mild'
 
   bool get soundEnabled => _soundEnabled;
   bool get memeEnabled => _memeEnabled;
+  bool get vibrationEnabled => _vibrationEnabled;
   String get audioTier => _audioTier;
+
+  void toggleVibration() {
+    _vibrationEnabled = !_vibrationEnabled;
+    try {
+      Hive.box('chakkar_prefs').put('vibration_enabled', _vibrationEnabled);
+    } catch (e) {
+      // ignore
+    }
+  }
+
+  Future<void> vibrateWrong() async {
+    if (!_vibrationEnabled) return;
+    try {
+      final hasVibrator = await Vibration.hasVibrator();
+      if (hasVibrator == true) {
+        Vibration.vibrate(duration: 200);
+      }
+    } catch (e) {
+      // ignore
+    }
+  }
 
   void setAudioTier(String tier) {
     _audioTier = tier;
@@ -32,9 +56,11 @@ class AudioManager {
       final box = Hive.box('chakkar_prefs');
       _soundEnabled = box.get('sound_enabled', defaultValue: true);
       _audioTier = box.get('audio_tier', defaultValue: 'standard');
+      _vibrationEnabled = box.get('vibration_enabled', defaultValue: true);
     } catch (e) {
       _soundEnabled = true;
       _audioTier = 'standard';
+      _vibrationEnabled = true;
     }
   }
 

@@ -241,6 +241,7 @@ class VisualGameNotifier extends StateNotifier<VisualGameState> {
       audioManager.playCorrect();
     } else {
       audioManager.playWrong();
+      audioManager.vibrateWrong();
     }
 
     state = state.copyWith(

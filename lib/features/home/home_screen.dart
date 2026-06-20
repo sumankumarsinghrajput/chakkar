@@ -16,6 +16,7 @@ import '../daily_challenge/daily_provider.dart';
 import '../settings/settings_screen.dart';
 import '../auth/data/upgrade_provider.dart';
 import '../auth/presentation/upgrade_dialog.dart';
+import '../rewards/rewards_screen.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -413,7 +414,14 @@ class _BottomNav extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
           const _NavItem(icon: Icons.home, label: 'Home', active: true),
-          _NavItem(icon: Icons.card_giftcard, label: 'Rewards', onTap: () {}),
+          _NavItem(
+            icon: Icons.card_giftcard,
+            label: 'Rewards',
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const RewardsScreen()),
+            ),
+          ),
           _NavItem(
             icon: Icons.history,
             label: 'History',

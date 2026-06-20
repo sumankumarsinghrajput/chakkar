@@ -83,11 +83,13 @@ class DailyChallengeState {
   int get totalSteps => questions.length + visualRounds.length;
   bool get isVisualStep => currentIndex >= questions.length;
   Question? get currentQuestion =>
-      !isVisualStep && currentIndex < questions.length ? questions[currentIndex] : null;
+      !isVisualStep && currentIndex < questions.length
+      ? questions[currentIndex]
+      : null;
   VisualRound? get currentVisual =>
       isVisualStep && (currentIndex - questions.length) < visualRounds.length
-          ? visualRounds[currentIndex - questions.length]
-          : null;
+      ? visualRounds[currentIndex - questions.length]
+      : null;
 
   DailyChallengeState copyWith({
     int? currentIndex,
@@ -118,10 +120,12 @@ class DailyChallengeNotifier extends StateNotifier<DailyChallengeState> {
   Timer? _timer;
 
   DailyChallengeNotifier()
-      : super(DailyChallengeState(
+    : super(
+        DailyChallengeState(
           questions: getDailyQuestions(),
           visualRounds: getDailyVisualRounds(),
-        )) {
+        ),
+      ) {
     _startTimer();
   }
 
@@ -160,6 +164,7 @@ class DailyChallengeNotifier extends StateNotifier<DailyChallengeState> {
       audioManager.playCorrect();
     } else {
       audioManager.playWrong();
+      audioManager.vibrateWrong();
     }
 
     state = state.copyWith(
@@ -193,7 +198,9 @@ class DailyChallengeNotifier extends StateNotifier<DailyChallengeState> {
     final user = _auth.currentUser;
     if (user == null) return;
 
-    final accuracy = state.totalSteps == 0 ? 0 : state.correct / state.totalSteps;
+    final accuracy = state.totalSteps == 0
+        ? 0
+        : state.correct / state.totalSteps;
     final coinReward = (accuracy * 100).round().clamp(10, 100);
 
     await _firestore
@@ -202,13 +209,13 @@ class DailyChallengeNotifier extends StateNotifier<DailyChallengeState> {
         .collection('daily')
         .doc(_todayKey())
         .set({
-      'completed': true,
-      'score': state.score,
-      'correct': state.correct,
-      'total': state.totalSteps,
-      'coinReward': coinReward,
-      'completedAt': FieldValue.serverTimestamp(),
-    });
+          'completed': true,
+          'score': state.score,
+          'correct': state.correct,
+          'total': state.totalSteps,
+          'coinReward': coinReward,
+          'completedAt': FieldValue.serverTimestamp(),
+        });
 
     await _firestore.collection('users').doc(user.uid).update({
       'coins': FieldValue.increment(coinReward),
@@ -216,7 +223,9 @@ class DailyChallengeNotifier extends StateNotifier<DailyChallengeState> {
   }
 
   int get coinReward {
-    final accuracy = state.totalSteps == 0 ? 0 : state.correct / state.totalSteps;
+    final accuracy = state.totalSteps == 0
+        ? 0
+        : state.correct / state.totalSteps;
     return (accuracy * 100).round().clamp(10, 100);
   }
 
@@ -228,5 +237,7 @@ class DailyChallengeNotifier extends StateNotifier<DailyChallengeState> {
 }
 
 final dailyChallengeProvider =
-    StateNotifierProvider.autoDispose<DailyChallengeNotifier, DailyChallengeState>(
-        (ref) => DailyChallengeNotifier());
+    StateNotifierProvider.autoDispose<
+      DailyChallengeNotifier,
+      DailyChallengeState
+    >((ref) => DailyChallengeNotifier());

@@ -1,8 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import '../../shared/services/audio_manager.dart';
 
 class OnboardingState {
+  final int age;
   final String gender;
   final String avatarId;
   final String username;
@@ -10,6 +12,7 @@ class OnboardingState {
   final String? error;
 
   const OnboardingState({
+    this.age = 0,
     this.gender = '',
     this.avatarId = '',
     this.username = '',
@@ -18,6 +21,7 @@ class OnboardingState {
   });
 
   OnboardingState copyWith({
+    int? age,
     String? gender,
     String? avatarId,
     String? username,
@@ -25,6 +29,7 @@ class OnboardingState {
     String? error,
   }) {
     return OnboardingState(
+      age: age ?? this.age,
       gender: gender ?? this.gender,
       avatarId: avatarId ?? this.avatarId,
       username: username ?? this.username,
@@ -32,10 +37,17 @@ class OnboardingState {
       error: error,
     );
   }
+
+  // Standard tier: 15-34. Mild tier: <15 or >34
+  String get audioTier => (age >= 15 && age <= 34) ? 'standard' : 'mild';
 }
 
 class OnboardingNotifier extends StateNotifier<OnboardingState> {
   OnboardingNotifier() : super(const OnboardingState());
+
+  void setAge(int age) {
+    state = state.copyWith(age: age);
+  }
 
   void setGender(String gender) {
     state = state.copyWith(gender: gender);
@@ -69,13 +81,12 @@ class OnboardingNotifier extends StateNotifier<OnboardingState> {
       }
 
       // Save user profile
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(user.uid)
-          .set({
+      await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
         'uid': user.uid,
         'username': username.toLowerCase(),
         'displayUsername': username,
+        'age': state.age,
+        'audioTier': state.audioTier,
         'gender': state.gender,
         'avatarId': state.avatarId,
         'xp': 0,
@@ -92,6 +103,7 @@ class OnboardingNotifier extends StateNotifier<OnboardingState> {
           .doc(username.toLowerCase())
           .set({'uid': user.uid});
 
+      audioManager.setAudioTier(state.audioTier);
       state = state.copyWith(isLoading: false);
       return true;
     } catch (e) {
@@ -103,5 +115,5 @@ class OnboardingNotifier extends StateNotifier<OnboardingState> {
 
 final onboardingProvider =
     StateNotifierProvider<OnboardingNotifier, OnboardingState>((ref) {
-  return OnboardingNotifier();
-});
+      return OnboardingNotifier();
+    });

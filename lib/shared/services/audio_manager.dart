@@ -12,16 +12,29 @@ class AudioManager {
   final AudioPlayer _player = AudioPlayer();
   bool _soundEnabled = true;
   bool _memeEnabled = true;
+  String _audioTier = 'standard'; // 'standard' or 'mild'
 
   bool get soundEnabled => _soundEnabled;
   bool get memeEnabled => _memeEnabled;
+  String get audioTier => _audioTier;
+
+  void setAudioTier(String tier) {
+    _audioTier = tier;
+    try {
+      Hive.box('chakkar_prefs').put('audio_tier', tier);
+    } catch (e) {
+      // ignore
+    }
+  }
 
   void _loadSettings() {
     try {
       final box = Hive.box('chakkar_prefs');
       _soundEnabled = box.get('sound_enabled', defaultValue: true);
+      _audioTier = box.get('audio_tier', defaultValue: 'standard');
     } catch (e) {
       _soundEnabled = true;
+      _audioTier = 'standard';
     }
   }
 
@@ -181,6 +194,9 @@ class AudioManager {
   }
 
   Future<void> _playRandom(String category) async {
+    print(
+      'AUDIO DEBUG: tier=$_audioTier soundEnabled=$_soundEnabled category=$category',
+    );
     if (!_soundEnabled) return;
     final sounds = _sounds[category] ?? [];
     if (sounds.isEmpty) return;
@@ -190,8 +206,41 @@ class AudioManager {
 
     if (available.isEmpty) available = sounds;
 
-    final sound = available[random.nextInt(available.length)];
+    var sound = available[random.nextInt(available.length)];
+
+    // If mild tier, try to use audio_mild version of the same file
+    if (_audioTier == 'mild') {
+      final mildSound = sound.replaceFirst(
+        'assets/audio/',
+        'assets/audio_mild/',
+      );
+      sound =
+          mildSound; // fallback to standard happens inside _playSound if file missing
+      await _playSoundWithFallback(
+        mildSound,
+        sound.replaceFirst('assets/audio_mild/', 'assets/audio/'),
+      );
+      return;
+    }
+
     await _playSound(sound);
+  }
+
+  Future<void> _playSoundWithFallback(
+    String preferredPath,
+    String fallbackPath,
+  ) async {
+    if (!_soundEnabled) return;
+    try {
+      await _player.stop();
+      final player = AudioPlayer();
+      await player.play(AssetSource(preferredPath.replaceFirst('assets/', '')));
+      _lastPlayed = preferredPath;
+      player.onPlayerComplete.listen((_) => player.dispose());
+    } catch (e) {
+      // Mild version doesn't exist yet, fallback to standard
+      await _playSound(fallbackPath);
+    }
   }
 
   Future<void> _playSound(String path) async {

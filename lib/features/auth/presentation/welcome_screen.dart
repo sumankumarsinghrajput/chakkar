@@ -4,7 +4,8 @@ import '../../../core/constants/app_colors.dart';
 import '../data/auth_provider.dart';
 import '../../home/home_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import '../../onboarding/gender_screen.dart';
+import '../../onboarding/age_screen.dart';
+import '../../../shared/services/audio_manager.dart';
 
 class WelcomeScreen extends ConsumerWidget {
   const WelcomeScreen({super.key});
@@ -23,6 +24,8 @@ class WelcomeScreen extends ConsumerWidget {
               .get();
           if (!context.mounted) return;
           if (doc.exists) {
+            final tier = doc.data()?['audioTier'] ?? 'standard';
+            audioManager.setAudioTier(tier);
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(builder: (_) => const HomeScreen()),
@@ -30,7 +33,7 @@ class WelcomeScreen extends ConsumerWidget {
           } else {
             Navigator.pushReplacement(
               context,
-              MaterialPageRoute(builder: (_) => const GenderScreen()),
+              MaterialPageRoute(builder: (_) => const AgeScreen()),
             );
           }
         }

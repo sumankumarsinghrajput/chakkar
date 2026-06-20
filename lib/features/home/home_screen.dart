@@ -11,6 +11,8 @@ import '../profile/profile_screen.dart';
 import '../friends/friends_screen.dart';
 import '../match_history/match_history_screen.dart';
 import '../store/store_screen.dart';
+import '../daily_challenge/daily_screen.dart';
+import '../daily_challenge/daily_provider.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -214,61 +216,101 @@ class _TopBar extends StatelessWidget {
   }
 }
 
-class _DailyChallenge extends StatelessWidget {
+class _DailyChallenge extends ConsumerWidget {
   @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFF78350F), Color(0xFFB45309)],
-        ),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFF59E0B).withOpacity(0.4)),
-      ),
-      child: Row(
-        children: [
-          const Icon(
-            Icons.local_fire_department,
-            color: Color(0xFFF59E0B),
-            size: 40,
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'DAILY CHALLENGE',
-                  style: Theme.of(
+  Widget build(BuildContext context, WidgetRef ref) {
+    final completedAsync = ref.watch(dailyCompletedProvider);
+
+    return completedAsync.when(
+      loading: () => const SizedBox(height: 80),
+      error: (_, __) => const SizedBox(height: 80),
+      data: (isCompleted) {
+        return GestureDetector(
+          onTap: isCompleted
+              ? null
+              : () {
+                  Navigator.push(
                     context,
-                  ).textTheme.titleLarge?.copyWith(color: Colors.white),
+                    MaterialPageRoute(
+                      builder: (_) => const DailyChallengeScreen(),
+                    ),
+                  );
+                },
+          child: Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: isCompleted
+                    ? [const Color(0xFF1F2937), const Color(0xFF374151)]
+                    : [const Color(0xFF78350F), const Color(0xFFB45309)],
+              ),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color:
+                    (isCompleted
+                            ? AppColors.textMuted
+                            : const Color(0xFFF59E0B))
+                        .withOpacity(0.4),
+              ),
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  isCompleted
+                      ? Icons.check_circle
+                      : Icons.local_fire_department,
+                  color: isCompleted
+                      ? AppColors.success
+                      : const Color(0xFFF59E0B),
+                  size: 40,
                 ),
-                Text(
-                  'Complete & Earn Big!',
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: const Color(0xFFFCD34D),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'DAILY CHALLENGE',
+                        style: Theme.of(
+                          context,
+                        ).textTheme.titleLarge?.copyWith(color: Colors.white),
+                      ),
+                      Text(
+                        isCompleted
+                            ? 'Come back tomorrow!'
+                            : 'Complete & Earn Big!',
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: isCompleted
+                              ? AppColors.textMuted
+                              : const Color(0xFFFCD34D),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
+                if (!isCompleted)
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 6,
+                    ),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF59E0B),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      'PLAY',
+                      style: Theme.of(
+                        context,
+                      ).textTheme.labelLarge?.copyWith(color: Colors.black),
+                    ),
+                  ),
               ],
             ),
           ),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-            decoration: BoxDecoration(
-              color: const Color(0xFFF59E0B),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Text(
-              'PLAY',
-              style: Theme.of(
-                context,
-              ).textTheme.labelLarge?.copyWith(color: Colors.black),
-            ),
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 }

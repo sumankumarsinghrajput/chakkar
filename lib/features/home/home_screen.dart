@@ -13,6 +13,7 @@ import '../match_history/match_history_screen.dart';
 import '../store/store_screen.dart';
 import '../daily_challenge/daily_screen.dart';
 import '../daily_challenge/daily_provider.dart';
+import '../settings/settings_screen.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -203,8 +204,14 @@ class _TopBar extends StatelessWidget {
             ),
           ),
           // Settings
+          // Settings
           IconButton(
-            onPressed: () {},
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const SettingsScreen()),
+              );
+            },
             icon: const Icon(
               Icons.settings_outlined,
               color: AppColors.textSecondary,

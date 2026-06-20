@@ -1,11 +1,13 @@
 import 'dart:math';
-import 'package:flutter/services.dart';
 import 'package:audioplayers/audioplayers.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 class AudioManager {
   static final AudioManager _instance = AudioManager._internal();
   factory AudioManager() => _instance;
-  AudioManager._internal();
+  AudioManager._internal() {
+    _loadSettings();
+  }
 
   final AudioPlayer _player = AudioPlayer();
   bool _soundEnabled = true;
@@ -14,7 +16,24 @@ class AudioManager {
   bool get soundEnabled => _soundEnabled;
   bool get memeEnabled => _memeEnabled;
 
-  void toggleSound() => _soundEnabled = !_soundEnabled;
+  void _loadSettings() {
+    try {
+      final box = Hive.box('chakkar_prefs');
+      _soundEnabled = box.get('sound_enabled', defaultValue: true);
+    } catch (e) {
+      _soundEnabled = true;
+    }
+  }
+
+  void toggleSound() {
+    _soundEnabled = !_soundEnabled;
+    try {
+      Hive.box('chakkar_prefs').put('sound_enabled', _soundEnabled);
+    } catch (e) {
+      // box not ready, ignore
+    }
+  }
+
   void toggleMeme() => _memeEnabled = !_memeEnabled;
 
   String? _lastPlayed;

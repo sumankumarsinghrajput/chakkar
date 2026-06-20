@@ -5,6 +5,8 @@ import '../../shared/widgets/avatar_widget.dart';
 import '../auth/presentation/welcome_screen.dart';
 import 'profile_provider.dart';
 import '../match_history/match_history_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import '../settings/settings_screen.dart';
 
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
@@ -23,7 +25,12 @@ class ProfileScreen extends ConsumerWidget {
         ),
         actions: [
           IconButton(
-            onPressed: () {},
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const SettingsScreen()),
+              );
+            },
             icon: const Icon(
               Icons.settings_outlined,
               color: AppColors.textSecondary,
@@ -63,20 +70,40 @@ class ProfileScreen extends ConsumerWidget {
                         showBorder: true,
                       ),
                       const SizedBox(height: 12),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            user.displayUsername,
-                            style: Theme.of(context).textTheme.headlineLarge,
+                      GestureDetector(
+                        onTap: () => _showEditUsername(
+                          context,
+                          ref,
+                          user.displayUsername,
+                        ),
+                        behavior: HitTestBehavior.opaque,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 8),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                user.displayUsername,
+                                style: Theme.of(
+                                  context,
+                                ).textTheme.headlineLarge,
+                              ),
+                              const SizedBox(width: 8),
+                              Container(
+                                padding: const EdgeInsets.all(4),
+                                decoration: BoxDecoration(
+                                  color: AppColors.primary.withOpacity(0.15),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: const Icon(
+                                  Icons.edit,
+                                  color: AppColors.primary,
+                                  size: 16,
+                                ),
+                              ),
+                            ],
                           ),
-                          const SizedBox(width: 8),
-                          const Icon(
-                            Icons.edit,
-                            color: AppColors.textMuted,
-                            size: 18,
-                          ),
-                        ],
+                        ),
                       ),
                       const SizedBox(height: 4),
                       Text(
@@ -160,7 +187,27 @@ class ProfileScreen extends ConsumerWidget {
                   ],
                 ),
                 const SizedBox(height: 16),
-                // Menu Items
+                // Account Info
+                _ProfileMenuItem(
+                  icon: Icons.email_outlined,
+                  label: 'ACCOUNT',
+                  subtitle: _getDisplayAccount(
+                    FirebaseAuth.instance.currentUser,
+                  ),
+                  onTap: () {},
+                  showArrow: false,
+                ),
+                const SizedBox(height: 8),
+                _ProfileMenuItem(
+                  icon: Icons.numbers,
+                  label: 'USER ID',
+                  subtitle:
+                      FirebaseAuth.instance.currentUser?.uid.substring(0, 12) ??
+                      '-',
+                  onTap: () {},
+                  showArrow: false,
+                ),
+                const SizedBox(height: 8),
                 _ProfileMenuItem(
                   icon: Icons.face,
                   label: 'AVATARS',
@@ -211,6 +258,86 @@ class ProfileScreen extends ConsumerWidget {
   }
 }
 
+void _showEditUsername(BuildContext context, WidgetRef ref, String current) {
+  final controller = TextEditingController(text: current);
+  showDialog(
+    context: context,
+    builder: (context) => AlertDialog(
+      backgroundColor: AppColors.surface,
+      title: const Text(
+        'Edit Username',
+        style: TextStyle(color: AppColors.textPrimary),
+      ),
+      content: TextField(
+        controller: controller,
+        style: const TextStyle(color: AppColors.textPrimary),
+        decoration: const InputDecoration(
+          hintText: 'New username',
+          hintStyle: TextStyle(color: AppColors.textMuted),
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text(
+            'Cancel',
+            style: TextStyle(color: AppColors.textSecondary),
+          ),
+        ),
+        ElevatedButton(
+          onPressed: () async {
+            final newName = controller.text.trim();
+            if (newName.isEmpty) return;
+            Navigator.pop(context);
+            try {
+              await ref
+                  .read(profileNotifierProvider.notifier)
+                  .updateUsername(newName);
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Username updated!'),
+                    backgroundColor: AppColors.success,
+                  ),
+                );
+              }
+            } catch (e) {
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(e.toString()),
+                    backgroundColor: AppColors.danger,
+                  ),
+                );
+              }
+            }
+          },
+          child: const Text('Save'),
+        ),
+      ],
+    ),
+  );
+}
+
+String _getDisplayAccount(User? user) {
+  if (user == null) return 'Not signed in';
+  final googleProvider = user.providerData
+      .where((p) => p.providerId == 'google.com')
+      .firstOrNull;
+  if (googleProvider != null) return googleProvider.email ?? 'Google Account';
+
+  final emailProvider = user.providerData
+      .where(
+        (p) =>
+            p.providerId == 'password' &&
+            !(p.email ?? '').endsWith('@chakkar.app'),
+      )
+      .firstOrNull;
+  if (emailProvider != null) return emailProvider.email ?? 'Email Account';
+
+  return 'Guest Account';
+}
+
 class _StatCard extends StatelessWidget {
   final String label;
   final String value;
@@ -258,12 +385,14 @@ class _ProfileMenuItem extends StatelessWidget {
   final String label;
   final String subtitle;
   final VoidCallback onTap;
+  final bool showArrow;
 
   const _ProfileMenuItem({
     required this.icon,
     required this.label,
     required this.subtitle,
     required this.onTap,
+    this.showArrow = true,
   });
 
   @override
@@ -290,11 +419,12 @@ class _ProfileMenuItem extends StatelessWidget {
                 ],
               ),
             ),
-            const Icon(
-              Icons.arrow_forward_ios,
-              color: AppColors.textMuted,
-              size: 16,
-            ),
+            if (showArrow)
+              const Icon(
+                Icons.arrow_forward_ios,
+                color: AppColors.textMuted,
+                size: 16,
+              ),
           ],
         ),
       ),

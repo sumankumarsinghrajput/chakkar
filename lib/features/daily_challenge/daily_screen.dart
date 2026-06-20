@@ -4,6 +4,7 @@ import '../../core/constants/app_colors.dart';
 import '../visual_game/visual_models.dart';
 import 'daily_provider.dart';
 import '../home/home_screen.dart';
+import '../../shared/services/audio_manager.dart';
 
 class DailyChallengeScreen extends ConsumerWidget {
   const DailyChallengeScreen({super.key});
@@ -40,7 +41,10 @@ class DailyChallengeScreen extends ConsumerWidget {
                 children: [
                   IconButton(
                     onPressed: () => Navigator.pop(context),
-                    icon: const Icon(Icons.close, color: AppColors.textSecondary),
+                    icon: const Icon(
+                      Icons.close,
+                      color: AppColors.textSecondary,
+                    ),
                   ),
                   Expanded(
                     child: ClipRRect(
@@ -48,14 +52,18 @@ class DailyChallengeScreen extends ConsumerWidget {
                       child: LinearProgressIndicator(
                         value: (state.currentIndex + 1) / state.totalSteps,
                         backgroundColor: AppColors.surface,
-                        valueColor: const AlwaysStoppedAnimation(Color(0xFFF59E0B)),
+                        valueColor: const AlwaysStoppedAnimation(
+                          Color(0xFFF59E0B),
+                        ),
                         minHeight: 8,
                       ),
                     ),
                   ),
                   const SizedBox(width: 8),
-                  Text('${state.currentIndex + 1}/${state.totalSteps}',
-                      style: Theme.of(context).textTheme.bodyMedium),
+                  Text(
+                    '${state.currentIndex + 1}/${state.totalSteps}',
+                    style: Theme.of(context).textTheme.bodyMedium,
+                  ),
                 ],
               ),
               const SizedBox(height: 16),
@@ -80,21 +88,33 @@ class DailyChallengeScreen extends ConsumerWidget {
                     child: Text(
                       '${state.timeLeft}s',
                       style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                            color: state.timeLeft <= 5 ? AppColors.danger : const Color(0xFFF59E0B),
-                          ),
+                        color: state.timeLeft <= 5
+                            ? AppColors.danger
+                            : const Color(0xFFF59E0B),
+                      ),
                     ),
                   ),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
                     decoration: BoxDecoration(
                       color: AppColors.surface,
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Row(
                       children: [
-                        const Icon(Icons.star, color: Color(0xFFF59E0B), size: 18),
+                        const Icon(
+                          Icons.star,
+                          color: Color(0xFFF59E0B),
+                          size: 18,
+                        ),
                         const SizedBox(width: 4),
-                        Text('${state.score}', style: Theme.of(context).textTheme.titleLarge),
+                        Text(
+                          '${state.score}',
+                          style: Theme.of(context).textTheme.titleLarge,
+                        ),
                       ],
                     ),
                   ),
@@ -103,8 +123,16 @@ class DailyChallengeScreen extends ConsumerWidget {
               const SizedBox(height: 24),
               Expanded(
                 child: state.isVisualStep
-                    ? _VisualStep(round: state.currentVisual!, state: state, onAnswer: notifier.answer)
-                    : _QuestionStep(question: state.currentQuestion!, state: state, onAnswer: notifier.answer),
+                    ? _VisualStep(
+                        round: state.currentVisual!,
+                        state: state,
+                        onAnswer: notifier.answer,
+                      )
+                    : _QuestionStep(
+                        question: state.currentQuestion!,
+                        state: state,
+                        onAnswer: notifier.answer,
+                      ),
               ),
             ],
           ),
@@ -119,7 +147,11 @@ class _QuestionStep extends StatelessWidget {
   final DailyChallengeState state;
   final Function(int) onAnswer;
 
-  const _QuestionStep({required this.question, required this.state, required this.onAnswer});
+  const _QuestionStep({
+    required this.question,
+    required this.state,
+    required this.onAnswer,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -191,13 +223,21 @@ class _VisualStep extends StatelessWidget {
   final DailyChallengeState state;
   final Function(int) onAnswer;
 
-  const _VisualStep({required this.round, required this.state, required this.onAnswer});
+  const _VisualStep({
+    required this.round,
+    required this.state,
+    required this.onAnswer,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Text(round.instruction, style: Theme.of(context).textTheme.headlineMedium, textAlign: TextAlign.center),
+        Text(
+          round.instruction,
+          style: Theme.of(context).textTheme.headlineMedium,
+          textAlign: TextAlign.center,
+        ),
         const SizedBox(height: 16),
         Expanded(
           child: round.textOptions != null
@@ -207,7 +247,9 @@ class _VisualStep extends StatelessWidget {
                       spacing: 8,
                       runSpacing: 8,
                       alignment: WrapAlignment.center,
-                      children: round.displayShapes.map((s) => Icon(s.icon, color: s.color, size: 28)).toList(),
+                      children: round.displayShapes
+                          .map((s) => Icon(s.icon, color: s.color, size: 28))
+                          .toList(),
                     ),
                     const SizedBox(height: 24),
                     ...List.generate(round.textOptions!.length, (index) {
@@ -234,8 +276,11 @@ class _VisualStep extends StatelessWidget {
                               borderRadius: BorderRadius.circular(12),
                               border: Border.all(color: border, width: 2),
                             ),
-                            child: Text(round.textOptions![index],
-                                textAlign: TextAlign.center, style: Theme.of(context).textTheme.titleLarge),
+                            child: Text(
+                              round.textOptions![index],
+                              textAlign: TextAlign.center,
+                              style: Theme.of(context).textTheme.titleLarge,
+                            ),
                           ),
                         ),
                       );
@@ -252,8 +297,10 @@ class _VisualStep extends StatelessWidget {
                   itemBuilder: (context, index) {
                     Color border = const Color(0xFFF59E0B).withOpacity(0.2);
                     if (state.answered) {
-                      if (index == round.correctIndex) border = AppColors.success;
-                      else if (index == state.selectedIndex) border = AppColors.danger;
+                      if (index == round.correctIndex)
+                        border = AppColors.success;
+                      else if (index == state.selectedIndex)
+                        border = AppColors.danger;
                     }
                     return GestureDetector(
                       onTap: state.answered ? null : () => onAnswer(index),
@@ -263,7 +310,11 @@ class _VisualStep extends StatelessWidget {
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(color: border, width: 2),
                         ),
-                        child: Icon(round.displayShapes[index].icon, color: round.displayShapes[index].color, size: 36),
+                        child: Icon(
+                          round.displayShapes[index].icon,
+                          color: round.displayShapes[index].color,
+                          size: 36,
+                        ),
                       ),
                     );
                   },
@@ -297,11 +348,17 @@ class _DailyResultScreen extends StatelessWidget {
           child: Column(
             children: [
               const SizedBox(height: 24),
-              const Icon(Icons.local_fire_department, color: Color(0xFFF59E0B), size: 64),
+              const Icon(
+                Icons.local_fire_department,
+                color: Color(0xFFF59E0B),
+                size: 64,
+              ),
               const SizedBox(height: 16),
               Text(
                 'CHALLENGE COMPLETE!',
-                style: Theme.of(context).textTheme.headlineLarge?.copyWith(color: const Color(0xFFF59E0B)),
+                style: Theme.of(context).textTheme.headlineLarge?.copyWith(
+                  color: const Color(0xFFF59E0B),
+                ),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 32),
@@ -311,18 +368,35 @@ class _DailyResultScreen extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: AppColors.surface,
                   borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: const Color(0xFFF59E0B).withOpacity(0.3)),
+                  border: Border.all(
+                    color: const Color(0xFFF59E0B).withOpacity(0.3),
+                  ),
                 ),
                 child: Column(
                   children: [
-                    Text('$score',
-                        style: Theme.of(context).textTheme.displayLarge?.copyWith(color: AppColors.primary)),
-                    Text('TOTAL SCORE', style: Theme.of(context).textTheme.bodyMedium?.copyWith(letterSpacing: 3)),
+                    Text(
+                      '$score',
+                      style: Theme.of(context).textTheme.displayLarge?.copyWith(
+                        color: AppColors.primary,
+                      ),
+                    ),
+                    Text(
+                      'TOTAL SCORE',
+                      style: Theme.of(
+                        context,
+                      ).textTheme.bodyMedium?.copyWith(letterSpacing: 3),
+                    ),
                     const SizedBox(height: 16),
-                    Text('$correct/$total Correct', style: Theme.of(context).textTheme.titleLarge),
+                    Text(
+                      '$correct/$total Correct',
+                      style: Theme.of(context).textTheme.titleLarge,
+                    ),
                     const SizedBox(height: 16),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 8,
+                      ),
                       decoration: BoxDecoration(
                         color: const Color(0xFFF59E0B).withOpacity(0.2),
                         borderRadius: BorderRadius.circular(12),
@@ -330,11 +404,20 @@ class _DailyResultScreen extends StatelessWidget {
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Icon(Icons.monetization_on, color: Color(0xFFF59E0B)),
+                          const Icon(
+                            Icons.monetization_on,
+                            color: Color(0xFFF59E0B),
+                          ),
                           const SizedBox(width: 6),
-                          Text('+$coinReward Coins',
-                              style: const TextStyle(
-                                  color: Color(0xFFF59E0B), fontFamily: 'Rajdhani', fontWeight: FontWeight.w700, fontSize: 16)),
+                          Text(
+                            '+$coinReward Coins',
+                            style: const TextStyle(
+                              color: Color(0xFFF59E0B),
+                              fontFamily: 'Rajdhani',
+                              fontWeight: FontWeight.w700,
+                              fontSize: 16,
+                            ),
+                          ),
                         ],
                       ),
                     ),
@@ -343,11 +426,14 @@ class _DailyResultScreen extends StatelessWidget {
               ),
               const Spacer(),
               ElevatedButton(
-                onPressed: () => Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(builder: (_) => const HomeScreen()),
-                  (route) => false,
-                ),
+                onPressed: () {
+                  audioManager.stopAll();
+                  Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(builder: (_) => const HomeScreen()),
+                    (route) => false,
+                  );
+                },
                 child: const Text('HOME'),
               ),
               const SizedBox(height: 16),

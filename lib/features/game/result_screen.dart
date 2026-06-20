@@ -33,6 +33,12 @@ class _ResultScreenState extends State<ResultScreen> {
     });
   }
 
+  @override
+  void dispose() {
+    audioManager.stopAll();
+    super.dispose();
+  }
+
   void _saveMatch() {
     saveMatchRecord(
       mode: MatchMode.single,

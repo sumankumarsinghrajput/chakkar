@@ -9,6 +9,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'share_card_screen.dart';
 import '../match_history/match_provider.dart';
 import '../match_history/match_model.dart';
+import '../../shared/services/audio_manager.dart';
 
 class MultiplayerResultScreen extends StatefulWidget {
   final Map<String, int> scores;
@@ -235,11 +236,14 @@ class _MultiplayerResultScreenState extends State<MultiplayerResultScreen> {
               ),
               const SizedBox(height: 12),
               OutlinedButton(
-                onPressed: () => Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(builder: (_) => const HomeScreen()),
-                  (route) => false,
-                ),
+                onPressed: () {
+                  audioManager.stopAll();
+                  Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(builder: (_) => const HomeScreen()),
+                    (route) => false,
+                  );
+                },
                 style: OutlinedButton.styleFrom(
                   minimumSize: const Size(double.infinity, 56),
                   side: const BorderSide(color: AppColors.primary),

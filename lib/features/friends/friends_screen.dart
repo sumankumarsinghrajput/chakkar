@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/constants/app_colors.dart';
 import '../../shared/widgets/avatar_widget.dart';
-import 'friends_model.dart';
 import 'friends_provider.dart';
+import '../auth/data/upgrade_provider.dart';
+import '../auth/presentation/upgrade_dialog.dart';
 
 class FriendsScreen extends ConsumerStatefulWidget {
   const FriendsScreen({super.key});
@@ -12,7 +13,8 @@ class FriendsScreen extends ConsumerStatefulWidget {
   ConsumerState<FriendsScreen> createState() => _FriendsScreenState();
 }
 
-class _FriendsScreenState extends ConsumerState<FriendsScreen> with SingleTickerProviderStateMixin {
+class _FriendsScreenState extends ConsumerState<FriendsScreen>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
   final _searchController = TextEditingController();
 
@@ -32,7 +34,10 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> with SingleTicker
   @override
   Widget build(BuildContext context) {
     final requestsAsync = ref.watch(friendRequestsProvider);
-    final requestCount = requestsAsync.maybeWhen(data: (r) => r.length, orElse: () => 0);
+    final requestCount = requestsAsync.maybeWhen(
+      data: (r) => r.length,
+      orElse: () => 0,
+    );
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -47,7 +52,10 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> with SingleTicker
           indicatorColor: AppColors.primary,
           labelColor: AppColors.primary,
           unselectedLabelColor: AppColors.textMuted,
-          labelStyle: const TextStyle(fontFamily: 'Rajdhani', fontWeight: FontWeight.w700),
+          labelStyle: const TextStyle(
+            fontFamily: 'Rajdhani',
+            fontWeight: FontWeight.w700,
+          ),
           tabs: [
             const Tab(text: 'FRIENDS'),
             Tab(
@@ -58,9 +66,21 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> with SingleTicker
                   if (requestCount > 0) ...[
                     const SizedBox(width: 4),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
-                      decoration: const BoxDecoration(color: AppColors.danger, shape: BoxShape.circle),
-                      child: Text('$requestCount', style: const TextStyle(color: Colors.white, fontSize: 10)),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 6,
+                        vertical: 1,
+                      ),
+                      decoration: const BoxDecoration(
+                        color: AppColors.danger,
+                        shape: BoxShape.circle,
+                      ),
+                      child: Text(
+                        '$requestCount',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 10,
+                        ),
+                      ),
                     ),
                   ],
                 ],
@@ -88,7 +108,9 @@ class _FriendsListTab extends ConsumerWidget {
     final friendsAsync = ref.watch(friendsListProvider);
 
     return friendsAsync.when(
-      loading: () => const Center(child: CircularProgressIndicator(color: AppColors.primary)),
+      loading: () => const Center(
+        child: CircularProgressIndicator(color: AppColors.primary),
+      ),
       error: (e, _) => Center(child: Text(e.toString())),
       data: (friends) {
         if (friends.isEmpty) {
@@ -96,10 +118,20 @@ class _FriendsListTab extends ConsumerWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Icon(Icons.people_outline, color: AppColors.textMuted, size: 64),
+                const Icon(
+                  Icons.people_outline,
+                  color: AppColors.textMuted,
+                  size: 64,
+                ),
                 const SizedBox(height: 16),
-                Text('No friends yet', style: Theme.of(context).textTheme.titleLarge),
-                Text('Search for players to add!', style: Theme.of(context).textTheme.bodyMedium),
+                Text(
+                  'No friends yet',
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
+                Text(
+                  'Search for players to add!',
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
               ],
             ),
           );
@@ -125,15 +157,26 @@ class _FriendsListTab extends ConsumerWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(friend.username, style: Theme.of(context).textTheme.titleLarge),
-                        Text('Level ${friend.level} • ${friend.wins} wins',
-                            style: Theme.of(context).textTheme.bodyMedium),
+                        Text(
+                          friend.username,
+                          style: Theme.of(context).textTheme.titleLarge,
+                        ),
+                        Text(
+                          'Level ${friend.level} • ${friend.wins} wins',
+                          style: Theme.of(context).textTheme.bodyMedium,
+                        ),
                       ],
                     ),
                   ),
                   IconButton(
-                    icon: const Icon(Icons.person_remove_outlined, color: AppColors.danger, size: 20),
-                    onPressed: () => ref.read(friendsNotifierProvider.notifier).removeFriend(friend.uid),
+                    icon: const Icon(
+                      Icons.person_remove_outlined,
+                      color: AppColors.danger,
+                      size: 20,
+                    ),
+                    onPressed: () => ref
+                        .read(friendsNotifierProvider.notifier)
+                        .removeFriend(friend.uid),
                   ),
                 ],
               ),
@@ -151,12 +194,17 @@ class _RequestsTab extends ConsumerWidget {
     final requestsAsync = ref.watch(friendRequestsProvider);
 
     return requestsAsync.when(
-      loading: () => const Center(child: CircularProgressIndicator(color: AppColors.primary)),
+      loading: () => const Center(
+        child: CircularProgressIndicator(color: AppColors.primary),
+      ),
       error: (e, _) => Center(child: Text(e.toString())),
       data: (requests) {
         if (requests.isEmpty) {
           return Center(
-            child: Text('No pending requests', style: Theme.of(context).textTheme.bodyMedium),
+            child: Text(
+              'No pending requests',
+              style: Theme.of(context).textTheme.bodyMedium,
+            ),
           );
         }
         return ListView.builder(
@@ -177,15 +225,22 @@ class _RequestsTab extends ConsumerWidget {
                   AvatarWidget(avatarId: req.fromAvatarId, size: 44),
                   const SizedBox(width: 12),
                   Expanded(
-                    child: Text(req.fromUsername, style: Theme.of(context).textTheme.titleLarge),
+                    child: Text(
+                      req.fromUsername,
+                      style: Theme.of(context).textTheme.titleLarge,
+                    ),
                   ),
                   IconButton(
                     icon: const Icon(Icons.close, color: AppColors.danger),
-                    onPressed: () => ref.read(friendsNotifierProvider.notifier).rejectFriendRequest(req.fromUid),
+                    onPressed: () => ref
+                        .read(friendsNotifierProvider.notifier)
+                        .rejectFriendRequest(req.fromUid),
                   ),
                   IconButton(
                     icon: const Icon(Icons.check, color: AppColors.success),
-                    onPressed: () => ref.read(friendsNotifierProvider.notifier).acceptFriendRequest(req.fromUid),
+                    onPressed: () => ref
+                        .read(friendsNotifierProvider.notifier)
+                        .acceptFriendRequest(req.fromUid),
                   ),
                 ],
               ),
@@ -217,8 +272,12 @@ class _SearchTab extends ConsumerWidget {
             ),
             child: TextField(
               controller: controller,
-              style: const TextStyle(color: AppColors.textPrimary, fontFamily: 'Rajdhani'),
-              onChanged: (value) => ref.read(userSearchProvider.notifier).search(value),
+              style: const TextStyle(
+                color: AppColors.textPrimary,
+                fontFamily: 'Rajdhani',
+              ),
+              onChanged: (value) =>
+                  ref.read(userSearchProvider.notifier).search(value),
               decoration: const InputDecoration(
                 hintText: 'Search by username',
                 hintStyle: TextStyle(color: AppColors.textMuted),
@@ -231,13 +290,17 @@ class _SearchTab extends ConsumerWidget {
           const SizedBox(height: 16),
           Expanded(
             child: searchAsync.when(
-              loading: () => const Center(child: CircularProgressIndicator(color: AppColors.primary)),
+              loading: () => const Center(
+                child: CircularProgressIndicator(color: AppColors.primary),
+              ),
               error: (e, _) => Center(child: Text(e.toString())),
               data: (results) {
                 if (results.isEmpty) {
                   return Center(
                     child: Text(
-                      controller.text.isEmpty ? 'Type a username to search' : 'No users found',
+                      controller.text.isEmpty
+                          ? 'Type a username to search'
+                          : 'No users found',
                       style: Theme.of(context).textTheme.bodyMedium,
                     ),
                   );
@@ -252,7 +315,9 @@ class _SearchTab extends ConsumerWidget {
                       decoration: BoxDecoration(
                         color: AppColors.surface,
                         borderRadius: BorderRadius.circular(14),
-                        border: Border.all(color: AppColors.primary.withOpacity(0.2)),
+                        border: Border.all(
+                          color: AppColors.primary.withOpacity(0.2),
+                        ),
                       ),
                       child: Row(
                         children: [
@@ -262,27 +327,59 @@ class _SearchTab extends ConsumerWidget {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(user.username, style: Theme.of(context).textTheme.titleLarge),
-                                Text('Level ${user.level}', style: Theme.of(context).textTheme.bodyMedium),
+                                Text(
+                                  user.username,
+                                  style: Theme.of(context).textTheme.titleLarge,
+                                ),
+                                Text(
+                                  'Level ${user.level}',
+                                  style: Theme.of(context).textTheme.bodyMedium,
+                                ),
                               ],
                             ),
                           ),
                           GestureDetector(
                             onTap: () async {
-                              await ref.read(friendsNotifierProvider.notifier).sendFriendRequest(user.uid);
+                              final isGuest = ref.read(isGuestProvider);
+                              if (isGuest) {
+                                final upgraded = await showDialog<bool>(
+                                  context: context,
+                                  builder: (_) => const UpgradeDialog(
+                                    reason: 'Sign in to add friends!',
+                                  ),
+                                );
+                                if (upgraded != true) return;
+                              }
+                              if (!context.mounted) return;
+                              await ref
+                                  .read(friendsNotifierProvider.notifier)
+                                  .sendFriendRequest(user.uid);
                               if (context.mounted) {
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(content: Text('Friend request sent!'), backgroundColor: AppColors.success),
+                                  const SnackBar(
+                                    content: Text('Friend request sent!'),
+                                    backgroundColor: AppColors.success,
+                                  ),
                                 );
                               }
                             },
                             child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 8,
+                              ),
                               decoration: BoxDecoration(
                                 color: AppColors.primary,
                                 borderRadius: BorderRadius.circular(8),
                               ),
-                              child: const Text('ADD', style: TextStyle(color: Colors.white, fontFamily: 'Rajdhani', fontWeight: FontWeight.w700)),
+                              child: const Text(
+                                'ADD',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontFamily: 'Rajdhani',
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
                             ),
                           ),
                         ],

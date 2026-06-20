@@ -65,6 +65,56 @@ class AuthService {
     }
   }
 
+  Future<UserCredential> linkWithGoogle() async {
+    final user = _auth.currentUser;
+    if (user == null) throw Exception('No user signed in');
+
+    final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
+    if (googleUser == null) throw Exception('Google sign in cancelled');
+
+    final GoogleSignInAuthentication googleAuth =
+        await googleUser.authentication;
+    final credential = GoogleAuthProvider.credential(
+      accessToken: googleAuth.accessToken,
+      idToken: googleAuth.idToken,
+    );
+
+    try {
+      return await user.linkWithCredential(credential);
+    } catch (e) {
+      if (e.toString().contains('provider-already-linked')) {
+        // Already linked to this provider — this is fine, treat as success
+        return await _auth.signInWithCredential(credential);
+      }
+      print('LINK ERROR: $e');
+      rethrow;
+    }
+  }
+
+  Future<UserCredential> linkWithEmail(String email, String password) async {
+    final user = _auth.currentUser;
+    if (user == null) throw Exception('No user signed in');
+
+    final credential = EmailAuthProvider.credential(
+      email: email,
+      password: password,
+    );
+    return await user.linkWithCredential(credential);
+  }
+
+  bool get isGuest {
+    final user = _auth.currentUser;
+    if (user == null) return false;
+    // Check providerData instead of email - more reliable after linking
+    final hasRealProvider = user.providerData.any(
+      (info) =>
+          info.providerId == 'google.com' ||
+          (info.providerId == 'password' &&
+              !(info.email ?? '').endsWith('@chakkar.app')),
+    );
+    return !hasRealProvider;
+  }
+
   Future<UserCredential> signUpWithEmail(String email, String password) async {
     return await _auth.createUserWithEmailAndPassword(
       email: email,

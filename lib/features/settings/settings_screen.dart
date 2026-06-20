@@ -60,13 +60,20 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   icon: Icons.person,
                   title: 'Username',
                   subtitle: profile?.displayUsername ?? '-',
-                  trailing: const Icon(Icons.edit, color: AppColors.textMuted, size: 18),
-                  onTap: () => _showEditUsername(context, profile?.displayUsername ?? ''),
+                  trailing: const Icon(
+                    Icons.edit,
+                    color: AppColors.textMuted,
+                    size: 18,
+                  ),
+                  onTap: () => _showEditUsername(
+                    context,
+                    profile?.displayUsername ?? '',
+                  ),
                 ),
                 _SettingsTile(
                   icon: Icons.email_outlined,
                   title: 'Email / Account',
-                  subtitle: user?.email ?? 'Guest Account',
+                  subtitle: _getDisplayAccount(user),
                 ),
                 _SettingsTile(
                   icon: Icons.numbers,
@@ -103,14 +110,38 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             style: OutlinedButton.styleFrom(
               minimumSize: const Size(double.infinity, 56),
               side: const BorderSide(color: AppColors.danger),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
             ),
-            child: const Text('SIGN OUT', style: TextStyle(color: AppColors.danger)),
+            child: const Text(
+              'SIGN OUT',
+              style: TextStyle(color: AppColors.danger),
+            ),
           ),
           const SizedBox(height: 24),
         ],
       ),
     );
+  }
+
+  String _getDisplayAccount(User? user) {
+    if (user == null) return 'Not signed in';
+    final googleProvider = user.providerData
+        .where((p) => p.providerId == 'google.com')
+        .firstOrNull;
+    if (googleProvider != null) return googleProvider.email ?? 'Google Account';
+
+    final emailProvider = user.providerData
+        .where(
+          (p) =>
+              p.providerId == 'password' &&
+              !(p.email ?? '').endsWith('@chakkar.app'),
+        )
+        .firstOrNull;
+    if (emailProvider != null) return emailProvider.email ?? 'Email Account';
+
+    return 'Guest Account';
   }
 
   void _showEditUsername(BuildContext context, String current) {
@@ -119,7 +150,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: AppColors.surface,
-        title: const Text('Edit Username', style: TextStyle(color: AppColors.textPrimary)),
+        title: const Text(
+          'Edit Username',
+          style: TextStyle(color: AppColors.textPrimary),
+        ),
         content: TextField(
           controller: controller,
           style: const TextStyle(color: AppColors.textPrimary),
@@ -131,7 +165,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel', style: TextStyle(color: AppColors.textSecondary)),
+            child: const Text(
+              'Cancel',
+              style: TextStyle(color: AppColors.textSecondary),
+            ),
           ),
           ElevatedButton(
             onPressed: () async {
@@ -139,16 +176,24 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               if (newName.isEmpty) return;
               Navigator.pop(context);
               try {
-                await ref.read(profileNotifierProvider.notifier).updateUsername(newName);
+                await ref
+                    .read(profileNotifierProvider.notifier)
+                    .updateUsername(newName);
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Username updated!'), backgroundColor: AppColors.success),
+                    const SnackBar(
+                      content: Text('Username updated!'),
+                      backgroundColor: AppColors.success,
+                    ),
                   );
                 }
               } catch (e) {
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text(e.toString()), backgroundColor: AppColors.danger),
+                    SnackBar(
+                      content: Text(e.toString()),
+                      backgroundColor: AppColors.danger,
+                    ),
                   );
                 }
               }
@@ -171,7 +216,9 @@ class _SectionTitle extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 8, left: 4),
       child: Text(
         title,
-        style: Theme.of(context).textTheme.bodyMedium?.copyWith(letterSpacing: 2),
+        style: Theme.of(
+          context,
+        ).textTheme.bodyMedium?.copyWith(letterSpacing: 2),
       ),
     );
   }
@@ -214,7 +261,10 @@ class _SettingsTile extends StatelessWidget {
                 children: [
                   Text(title, style: Theme.of(context).textTheme.titleLarge),
                   if (subtitle != null)
-                    Text(subtitle!, style: Theme.of(context).textTheme.bodyMedium),
+                    Text(
+                      subtitle!,
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
                 ],
               ),
             ),

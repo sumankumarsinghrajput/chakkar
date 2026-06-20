@@ -14,6 +14,8 @@ import '../store/store_screen.dart';
 import '../daily_challenge/daily_screen.dart';
 import '../daily_challenge/daily_provider.dart';
 import '../settings/settings_screen.dart';
+import '../auth/data/upgrade_provider.dart';
+import '../auth/presentation/upgrade_dialog.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -63,13 +65,27 @@ class HomeScreen extends ConsumerWidget {
                         subtitle: 'Play with Real Players',
                         icon: Icons.groups,
                         gradient: AppColors.primaryGradient,
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => const MultiplayerMenuScreen(),
-                            ),
-                          );
+                        onTap: () async {
+                          final isGuest = ref.read(isGuestProvider);
+                          if (isGuest) {
+                            final upgraded = await showDialog<bool>(
+                              context: context,
+                              builder: (_) => const UpgradeDialog(
+                                reason:
+                                    'Sign in to play multiplayer with friends!',
+                              ),
+                            );
+                            if (upgraded != true) return;
+                            ref.invalidate(isGuestProvider);
+                          }
+                          if (context.mounted) {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const MultiplayerMenuScreen(),
+                              ),
+                            );
+                          }
                         },
                       ),
                       const SizedBox(height: 12),

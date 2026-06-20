@@ -51,6 +51,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "999213489105-sh8annm0n0j01opv6gaif0thgr9rv6um.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.sumankumar.chakkar",
+            "certificate_hash": "ccec483876881704aa7eb08c2fd984be7cb523b9"
+          }
+        },
+        {
           "client_id": "999213489105-tk4g6rp0mlqo7m5e7kqisvke9lj6u1v7.apps.googleusercontent.com",
           "client_type": 3
         }

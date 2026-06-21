@@ -1,7 +1,7 @@
 import 'dart:math';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:vibration/vibration.dart';
+import 'package:flutter/services.dart';
 
 class AudioManager {
   static final AudioManager _instance = AudioManager._internal();
@@ -33,10 +33,7 @@ class AudioManager {
   Future<void> vibrateWrong() async {
     if (!_vibrationEnabled) return;
     try {
-      final hasVibrator = await Vibration.hasVibrator();
-      if (hasVibrator == true) {
-        Vibration.vibrate(duration: 200);
-      }
+      HapticFeedback.heavyImpact();
     } catch (e) {
       // ignore
     }
@@ -220,9 +217,6 @@ class AudioManager {
   }
 
   Future<void> _playRandom(String category) async {
-    print(
-      'AUDIO DEBUG: tier=$_audioTier soundEnabled=$_soundEnabled category=$category',
-    );
     if (!_soundEnabled) return;
     final sounds = _sounds[category] ?? [];
     if (sounds.isEmpty) return;

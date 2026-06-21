@@ -6,6 +6,7 @@ import 'core/theme/app_theme.dart';
 import 'features/splash/splash_screen.dart';
 import 'firebase_options.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'shared/services/notification_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -23,6 +24,8 @@ void main() async {
 
   await Hive.initFlutter();
   await Hive.openBox('chakkar_prefs');
+
+  await notificationService.init();
 
   runApp(const ProviderScope(child: ChakkarApp()));
 }

@@ -8,6 +8,7 @@ import 'multiplayer_game_provider.dart';
 import 'multiplayer_result_screen.dart';
 import 'room_model.dart';
 import 'room_provider.dart';
+import '../../shared/services/presence_service.dart';
 
 class MultiplayerGameScreen extends ConsumerStatefulWidget {
   final String roomId;
@@ -28,8 +29,7 @@ class MultiplayerGameScreen extends ConsumerStatefulWidget {
       _MultiplayerGameScreenState();
 }
 
-class _MultiplayerGameScreenState
-    extends ConsumerState<MultiplayerGameScreen> {
+class _MultiplayerGameScreenState extends ConsumerState<MultiplayerGameScreen> {
   late final Map<String, dynamic> _params;
 
   @override
@@ -40,6 +40,13 @@ class _MultiplayerGameScreenState
       'isHost': widget.isHost,
       'questions': widget.questions,
     };
+    presenceService.setInGame(true);
+  }
+
+  @override
+  void dispose() {
+    presenceService.setInGame(false);
+    super.dispose();
   }
 
   @override
@@ -109,8 +116,7 @@ class _MultiplayerGameScreenState
                       if (context.mounted) {
                         Navigator.pushAndRemoveUntil(
                           context,
-                          MaterialPageRoute(
-                              builder: (_) => const HomeScreen()),
+                          MaterialPageRoute(builder: (_) => const HomeScreen()),
                           (route) => false,
                         );
                       }
@@ -124,11 +130,13 @@ class _MultiplayerGameScreenState
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(8),
                       child: LinearProgressIndicator(
-                        value: (gameState.currentQuestionIndex + 1) /
+                        value:
+                            (gameState.currentQuestionIndex + 1) /
                             gameState.questions.length,
                         backgroundColor: AppColors.surface,
                         valueColor: const AlwaysStoppedAnimation(
-                            AppColors.primary),
+                          AppColors.primary,
+                        ),
                         minHeight: 8,
                       ),
                     ),
@@ -147,14 +155,15 @@ class _MultiplayerGameScreenState
                 children: [
                   Text(
                     'ROUND ${gameState.currentQuestionIndex + 1}/${gameState.questions.length}',
-                    style: Theme.of(context)
-                        .textTheme
-                        .bodyMedium
-                        ?.copyWith(letterSpacing: 2),
+                    style: Theme.of(
+                      context,
+                    ).textTheme.bodyMedium?.copyWith(letterSpacing: 2),
                   ),
                   Container(
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 8),
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
                     decoration: BoxDecoration(
                       color: gameState.timeLeft <= 5
                           ? AppColors.danger.withOpacity(0.2)
@@ -168,9 +177,7 @@ class _MultiplayerGameScreenState
                     ),
                     child: Text(
                       '${gameState.timeLeft}',
-                      style: Theme.of(context)
-                          .textTheme
-                          .headlineMedium
+                      style: Theme.of(context).textTheme.headlineMedium
                           ?.copyWith(
                             color: gameState.timeLeft <= 5
                                 ? AppColors.danger
@@ -191,15 +198,16 @@ class _MultiplayerGameScreenState
                     return Container(
                       margin: const EdgeInsets.only(right: 8),
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 6),
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
                       decoration: BoxDecoration(
                         color: AppColors.surface,
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Row(
                         children: [
-                          AvatarWidget(
-                              avatarId: player.avatarId, size: 32),
+                          AvatarWidget(avatarId: player.avatarId, size: 32),
                           const SizedBox(width: 8),
                           Column(
                             mainAxisAlignment: MainAxisAlignment.center,
@@ -207,16 +215,13 @@ class _MultiplayerGameScreenState
                             children: [
                               Text(
                                 player.username,
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodyMedium
-                                    ?.copyWith(fontSize: 11),
+                                style: Theme.of(
+                                  context,
+                                ).textTheme.bodyMedium?.copyWith(fontSize: 11),
                               ),
                               Text(
                                 '$score',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .titleLarge
+                                style: Theme.of(context).textTheme.titleLarge
                                     ?.copyWith(color: AppColors.primary),
                               ),
                             ],
@@ -235,9 +240,7 @@ class _MultiplayerGameScreenState
                 decoration: BoxDecoration(
                   color: AppColors.surface,
                   borderRadius: BorderRadius.circular(20),
-                  border: Border.all(
-                    color: AppColors.primary.withOpacity(0.2),
-                  ),
+                  border: Border.all(color: AppColors.primary.withOpacity(0.2)),
                 ),
                 child: Text(
                   question.question,
@@ -249,8 +252,7 @@ class _MultiplayerGameScreenState
               // Options
               Expanded(
                 child: GridView.builder(
-                  gridDelegate:
-                      const SliverGridDelegateWithFixedCrossAxisCount(
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 2,
                     crossAxisSpacing: 12,
                     mainAxisSpacing: 12,
@@ -259,8 +261,7 @@ class _MultiplayerGameScreenState
                   itemCount: question.options.length,
                   itemBuilder: (context, index) {
                     Color bgColor = AppColors.surface;
-                    Color borderColor =
-                        AppColors.primary.withOpacity(0.2);
+                    Color borderColor = AppColors.primary.withOpacity(0.2);
 
                     if (gameState.answered) {
                       if (index == question.correctIndex) {
@@ -280,14 +281,12 @@ class _MultiplayerGameScreenState
                         decoration: BoxDecoration(
                           color: bgColor,
                           borderRadius: BorderRadius.circular(12),
-                          border:
-                              Border.all(color: borderColor, width: 2),
+                          border: Border.all(color: borderColor, width: 2),
                         ),
                         child: Center(
                           child: Text(
                             question.options[index],
-                            style:
-                                Theme.of(context).textTheme.titleLarge,
+                            style: Theme.of(context).textTheme.titleLarge,
                             textAlign: TextAlign.center,
                           ),
                         ),

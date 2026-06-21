@@ -9,6 +9,8 @@ import '../home/home_screen.dart';
 import '../game/game_models.dart';
 import '../game/game_provider.dart';
 import 'multiplayer_game_screen.dart';
+import '../friends/friends_provider.dart';
+import '../friends/friends_model.dart';
 
 class LobbyScreen extends ConsumerWidget {
   final String roomId;

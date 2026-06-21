@@ -12,7 +12,7 @@ class NotificationService {
       FlutterLocalNotificationsPlugin();
   bool _initialized = false;
 
-  Future<void> init() async {
+  Future<void> init({void Function(String?)? onTap}) async {
     if (_initialized) return;
     tz_data.initializeTimeZones();
 
@@ -21,7 +21,12 @@ class NotificationService {
     );
     const initSettings = InitializationSettings(android: androidSettings);
 
-    await _plugin.initialize(initSettings);
+    await _plugin.initialize(
+      initSettings,
+      onDidReceiveNotificationResponse: (response) {
+        onTap?.call(response.payload);
+      },
+    );
 
     // Request permission (Android 13+)
     await _plugin
@@ -106,6 +111,7 @@ class NotificationService {
     required String title,
     required String body,
     int id = 0,
+    String? payload,
   }) async {
     await _plugin.show(
       id,
@@ -120,6 +126,7 @@ class NotificationService {
           priority: Priority.high,
         ),
       ),
+      payload: payload,
     );
   }
 }

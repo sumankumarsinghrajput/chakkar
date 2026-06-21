@@ -6,6 +6,8 @@ import '../../home/home_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../onboarding/age_screen.dart';
 import '../../../shared/services/audio_manager.dart';
+import '../../../shared/services/notification_listener_service.dart';
+import '../../../shared/services/presence_service.dart';
 
 class WelcomeScreen extends ConsumerWidget {
   const WelcomeScreen({super.key});
@@ -26,6 +28,8 @@ class WelcomeScreen extends ConsumerWidget {
           if (doc.exists) {
             final tier = doc.data()?['audioTier'] ?? 'standard';
             audioManager.setAudioTier(tier);
+            notificationListenerService.start();
+            presenceService.start();
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(builder: (_) => const HomeScreen()),

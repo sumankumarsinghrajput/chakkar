@@ -5,6 +5,7 @@ import '../../shared/widgets/avatar_widget.dart';
 import 'friends_provider.dart';
 import '../auth/data/upgrade_provider.dart';
 import '../auth/presentation/upgrade_dialog.dart';
+import '../multiplayer/lobby_screen.dart';
 
 class FriendsScreen extends ConsumerStatefulWidget {
   const FriendsScreen({super.key});
@@ -21,7 +22,7 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 4, vsync: this);
   }
 
   @override
@@ -86,6 +87,7 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen>
                 ],
               ),
             ),
+            const Tab(text: 'INVITES'),
             const Tab(text: 'SEARCH'),
           ],
         ),
@@ -95,6 +97,7 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen>
         children: [
           _FriendsListTab(),
           _RequestsTab(),
+          _RoomInvitesTab(),
           _SearchTab(controller: _searchController),
         ],
       ),
@@ -151,7 +154,42 @@ class _FriendsListTab extends ConsumerWidget {
               ),
               child: Row(
                 children: [
-                  AvatarWidget(avatarId: friend.avatarId, size: 44),
+                  Consumer(
+                    builder: (context, ref, _) {
+                      final presenceAsync = ref.watch(
+                        friendPresenceProvider(friend.uid),
+                      );
+                      return presenceAsync.when(
+                        loading: () =>
+                            AvatarWidget(avatarId: friend.avatarId, size: 44),
+                        error: (_, __) =>
+                            AvatarWidget(avatarId: friend.avatarId, size: 44),
+                        data: (presence) => Stack(
+                          children: [
+                            AvatarWidget(avatarId: friend.avatarId, size: 44),
+                            Positioned(
+                              right: 0,
+                              bottom: 0,
+                              child: Container(
+                                width: 12,
+                                height: 12,
+                                decoration: BoxDecoration(
+                                  color: presence.isOnline
+                                      ? AppColors.success
+                                      : AppColors.textMuted,
+                                  shape: BoxShape.circle,
+                                  border: Border.all(
+                                    color: AppColors.surface,
+                                    width: 2,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Column(
@@ -161,9 +199,24 @@ class _FriendsListTab extends ConsumerWidget {
                           friend.username,
                           style: Theme.of(context).textTheme.titleLarge,
                         ),
-                        Text(
-                          'Level ${friend.level} • ${friend.wins} wins',
-                          style: Theme.of(context).textTheme.bodyMedium,
+                        Consumer(
+                          builder: (context, ref, _) {
+                            final presenceAsync = ref.watch(
+                              friendPresenceProvider(friend.uid),
+                            );
+                            final statusText = presenceAsync.maybeWhen(
+                              data: (p) => p.inGame
+                                  ? 'In a game'
+                                  : p.isOnline
+                                  ? 'Online'
+                                  : 'Offline',
+                              orElse: () => '',
+                            );
+                            return Text(
+                              'Level ${friend.level} • $statusText',
+                              style: Theme.of(context).textTheme.bodyMedium,
+                            );
+                          },
                         ),
                       ],
                     ),
@@ -241,6 +294,109 @@ class _RequestsTab extends ConsumerWidget {
                     onPressed: () => ref
                         .read(friendsNotifierProvider.notifier)
                         .acceptFriendRequest(req.fromUid),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+}
+
+class _RoomInvitesTab extends ConsumerWidget {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final invitesAsync = ref.watch(roomInvitesProvider);
+
+    return invitesAsync.when(
+      loading: () => const Center(
+        child: CircularProgressIndicator(color: AppColors.primary),
+      ),
+      error: (e, _) => Center(child: Text(e.toString())),
+      data: (invites) {
+        if (invites.isEmpty) {
+          return Center(
+            child: Text(
+              'No room invites',
+              style: Theme.of(context).textTheme.bodyMedium,
+            ),
+          );
+        }
+        return ListView.builder(
+          padding: const EdgeInsets.all(16),
+          itemCount: invites.length,
+          itemBuilder: (context, index) {
+            final invite = invites[index];
+            return Container(
+              margin: const EdgeInsets.only(bottom: 10),
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                color: AppColors.surface,
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(color: AppColors.secondary.withOpacity(0.3)),
+              ),
+              child: Row(
+                children: [
+                  const Icon(
+                    Icons.groups,
+                    color: AppColors.secondary,
+                    size: 32,
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '${invite.fromUsername} invited you',
+                          style: Theme.of(context).textTheme.titleLarge,
+                        ),
+                        Text(
+                          invite.roomName,
+                          style: Theme.of(context).textTheme.bodyMedium,
+                        ),
+                      ],
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.close, color: AppColors.danger),
+                    onPressed: () => dismissRoomInvite(invite.id),
+                  ),
+                  GestureDetector(
+                    onTap: () async {
+                      await dismissRoomInvite(invite.id);
+                      if (context.mounted) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => LobbyScreen(
+                              roomId: invite.roomId,
+                              isJoining: true,
+                            ),
+                          ),
+                        );
+                      }
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 8,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppColors.success,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: const Text(
+                        'JOIN',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontFamily: 'Rajdhani',
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
                   ),
                 ],
               ),

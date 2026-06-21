@@ -11,7 +11,10 @@ final auth = FirebaseAuth.instance;
 String generateRoomCode() {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
   final random = Random();
-  final code = List.generate(3, (_) => chars[random.nextInt(chars.length)]).join();
+  final code = List.generate(
+    3,
+    (_) => chars[random.nextInt(chars.length)],
+  ).join();
   final nums = List.generate(4, (_) => random.nextInt(10).toString()).join();
   return '$code-$nums';
 }
@@ -78,6 +81,101 @@ class RoomNotifier extends StateNotifier<AsyncValue<RoomModel?>> {
     }
   }
 
+  Future<String?> createRoomWithFriends({
+    required String roomName,
+    required List<String> friendUids,
+    required String difficulty,
+    String? customCode,
+  }) async {
+    state = const AsyncValue.loading();
+    try {
+      final user = auth.currentUser;
+      if (user == null) throw Exception('Not logged in');
+
+      final userDoc = await firestore.collection('users').doc(user.uid).get();
+      final userData = userDoc.data()!;
+
+      final roomCode = customCode ?? generateRoomCode();
+      final maxPlayers = friendUids.length + 1;
+
+      final hostPlayer = {
+        'uid': user.uid,
+        'username': userData['displayUsername'],
+        'avatarId': userData['avatarId'],
+        'level': userData['level'],
+        'isReady': true,
+        'isHost': true,
+      };
+
+      // Build players map with host + all selected friends auto-added
+      final playersMap = <String, dynamic>{user.uid: hostPlayer};
+
+      for (final friendUid in friendUids) {
+        // Re-check live presence right before adding — prevents race conditions
+        final presenceSnap = await FirebaseDatabase.instance
+            .ref('presence/$friendUid')
+            .get();
+        final presenceData = presenceSnap.value as Map?;
+        final isOnline = presenceData?['state'] == 'online';
+        final inGame = presenceData?['inGame'] == true;
+        if (!isOnline || inGame) continue; // skip busy/offline friends
+
+        final friendDoc = await firestore
+            .collection('users')
+            .doc(friendUid)
+            .get();
+        final friendData = friendDoc.data();
+        if (friendData == null) continue;
+        playersMap[friendUid] = {
+          'uid': friendUid,
+          'username': friendData['displayUsername'],
+          'avatarId': friendData['avatarId'],
+          'level': friendData['level'],
+          'isReady': false,
+          'isHost': false,
+        };
+      }
+
+      final roomRef = firestore.collection('rooms').doc();
+
+      await roomRef.set({
+        'roomName': roomName,
+        'roomCode': roomCode,
+        'hostId': user.uid,
+        'maxPlayers': maxPlayers,
+        'difficulty': difficulty,
+        'isPublic': false,
+        'status': 'waiting',
+        'players': playersMap,
+        'pendingRequests': [],
+        'createdAt': FieldValue.serverTimestamp(),
+      });
+
+      // Send room invite notifications to each friend
+      for (final friendUid in friendUids) {
+        await firestore
+            .collection('users')
+            .doc(friendUid)
+            .collection('roomInvites')
+            .add({
+              'fromUid': user.uid,
+              'fromUsername': userData['displayUsername'],
+              'roomId': roomRef.id,
+              'roomCode': roomCode,
+              'roomName': roomName,
+              'autoJoined': true,
+              'sentAt': FieldValue.serverTimestamp(),
+            });
+      }
+
+      state = const AsyncValue.data(null);
+      return roomRef.id;
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
+      return null;
+    }
+  }
+
   Future<String?> findRoomByCode(String code) async {
     try {
       final query = await firestore
@@ -109,8 +207,7 @@ class RoomNotifier extends StateNotifier<AsyncValue<RoomModel?>> {
 
   Future<void> approvePlayer(String roomId, String playerId) async {
     try {
-      final playerDoc =
-          await firestore.collection('users').doc(playerId).get();
+      final playerDoc = await firestore.collection('users').doc(playerId).get();
       final playerData = playerDoc.data()!;
 
       final playerMap = {
@@ -160,15 +257,12 @@ class RoomNotifier extends StateNotifier<AsyncValue<RoomModel?>> {
     }
   }
 
-  Future<void> transferHostIfNeeded(
-      String roomId, String leavingUid) async {
-    final roomDoc =
-        await firestore.collection('rooms').doc(roomId).get();
+  Future<void> transferHostIfNeeded(String roomId, String leavingUid) async {
+    final roomDoc = await firestore.collection('rooms').doc(roomId).get();
     final data = roomDoc.data();
     if (data == null) return;
 
-    final playersMap =
-        data['players'] as Map<String, dynamic>? ?? {};
+    final playersMap = data['players'] as Map<String, dynamic>? ?? {};
     final playerIds = playersMap.keys.toList();
     playerIds.remove(leavingUid);
 
@@ -192,14 +286,14 @@ class RoomNotifier extends StateNotifier<AsyncValue<RoomModel?>> {
   }
 
   Future<void> handlePlayerLeavesDuringGame(
-      String roomId, String leavingUid) async {
-    final roomDoc =
-        await firestore.collection('rooms').doc(roomId).get();
+    String roomId,
+    String leavingUid,
+  ) async {
+    final roomDoc = await firestore.collection('rooms').doc(roomId).get();
     final data = roomDoc.data();
     if (data == null) return;
 
-    final playersMap =
-        data['players'] as Map<String, dynamic>? ?? {};
+    final playersMap = data['players'] as Map<String, dynamic>? ?? {};
     final remainingCount = playersMap.length - 1;
 
     if (remainingCount < 2) {
@@ -207,9 +301,9 @@ class RoomNotifier extends StateNotifier<AsyncValue<RoomModel?>> {
         'status': 'finished',
         'players.$leavingUid': FieldValue.delete(),
       });
-      await FirebaseDatabase.instance
-          .ref('games/$roomId')
-          .update({'isFinished': true});
+      await FirebaseDatabase.instance.ref('games/$roomId').update({
+        'isFinished': true,
+      });
     } else {
       await firestore.collection('rooms').doc(roomId).update({
         'players.$leavingUid': FieldValue.delete(),
@@ -220,11 +314,13 @@ class RoomNotifier extends StateNotifier<AsyncValue<RoomModel?>> {
 
 final roomProvider =
     StateNotifierProvider<RoomNotifier, AsyncValue<RoomModel?>>((ref) {
-  return RoomNotifier();
-});
+      return RoomNotifier();
+    });
 
-final roomStreamProvider =
-    StreamProvider.family<RoomModel?, String>((ref, roomId) {
+final roomStreamProvider = StreamProvider.family<RoomModel?, String>((
+  ref,
+  roomId,
+) {
   return firestore.collection('rooms').doc(roomId).snapshots().map((doc) {
     if (!doc.exists) return null;
     return RoomModel.fromMap(doc.data()!, doc.id);
@@ -237,7 +333,9 @@ final publicRoomsProvider = StreamProvider<List<RoomModel>>((ref) {
       .where('isPublic', isEqualTo: true)
       .where('status', isEqualTo: 'waiting')
       .snapshots()
-      .map((query) => query.docs
-          .map((doc) => RoomModel.fromMap(doc.data(), doc.id))
-          .toList());
+      .map(
+        (query) => query.docs
+            .map((doc) => RoomModel.fromMap(doc.data(), doc.id))
+            .toList(),
+      );
 });

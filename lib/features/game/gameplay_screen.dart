@@ -6,6 +6,7 @@ import 'game_provider.dart';
 import 'result_screen.dart';
 import '../../shared/services/audio_manager.dart';
 import '../store/store_provider.dart';
+import '../../shared/services/presence_service.dart';
 
 class GameplayScreen extends ConsumerStatefulWidget {
   final List<Question> questions;
@@ -31,10 +32,12 @@ class _GameplayScreenState extends ConsumerState<GameplayScreen> {
   void initState() {
     super.initState();
     _params = {'questions': widget.questions, 'difficulty': widget.difficulty};
+    presenceService.setInGame(true);
   }
 
   @override
   void dispose() {
+    presenceService.setInGame(false);
     super.dispose();
   }
 

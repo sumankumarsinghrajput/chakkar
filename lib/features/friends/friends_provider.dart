@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'friends_model.dart';
+import 'package:firebase_database/firebase_database.dart';
 
 final _firestore = FirebaseFirestore.instance;
 final _auth = FirebaseAuth.instance;
@@ -9,7 +10,8 @@ final _auth = FirebaseAuth.instance;
 // Search users by username prefix
 final userSearchProvider =
     StateNotifierProvider<UserSearchNotifier, AsyncValue<List<FriendUser>>>(
-        (ref) => UserSearchNotifier());
+      (ref) => UserSearchNotifier(),
+    );
 
 class UserSearchNotifier extends StateNotifier<AsyncValue<List<FriendUser>>> {
   UserSearchNotifier() : super(const AsyncValue.data([]));
@@ -53,15 +55,18 @@ final friendsListProvider = StreamProvider<List<FriendUser>>((ref) {
       .collection('friends')
       .snapshots()
       .asyncMap((snapshot) async {
-    final friends = <FriendUser>[];
-    for (final doc in snapshot.docs) {
-      final friendDoc = await _firestore.collection('users').doc(doc.id).get();
-      if (friendDoc.exists) {
-        friends.add(FriendUser.fromMap(friendDoc.data()!, doc.id));
-      }
-    }
-    return friends;
-  });
+        final friends = <FriendUser>[];
+        for (final doc in snapshot.docs) {
+          final friendDoc = await _firestore
+              .collection('users')
+              .doc(doc.id)
+              .get();
+          if (friendDoc.exists) {
+            friends.add(FriendUser.fromMap(friendDoc.data()!, doc.id));
+          }
+        }
+        return friends;
+      });
 });
 
 // Incoming friend requests
@@ -75,8 +80,11 @@ final friendRequestsProvider = StreamProvider<List<FriendRequest>>((ref) {
       .collection('friendRequests')
       .where('status', isEqualTo: 'pending')
       .snapshots()
-      .map((snapshot) =>
-          snapshot.docs.map((doc) => FriendRequest.fromMap(doc.data(), doc.id)).toList());
+      .map(
+        (snapshot) => snapshot.docs
+            .map((doc) => FriendRequest.fromMap(doc.data(), doc.id))
+            .toList(),
+      );
 });
 
 class FriendsNotifier extends StateNotifier<bool> {
@@ -96,12 +104,12 @@ class FriendsNotifier extends StateNotifier<bool> {
         .collection('friendRequests')
         .doc(user.uid)
         .set({
-      'fromUid': user.uid,
-      'fromUsername': myData['displayUsername'],
-      'fromAvatarId': myData['avatarId'],
-      'status': 'pending',
-      'sentAt': FieldValue.serverTimestamp(),
-    });
+          'fromUid': user.uid,
+          'fromUsername': myData['displayUsername'],
+          'fromAvatarId': myData['avatarId'],
+          'status': 'pending',
+          'sentAt': FieldValue.serverTimestamp(),
+        });
   }
 
   Future<void> acceptFriendRequest(String fromUid) async {
@@ -162,7 +170,106 @@ class FriendsNotifier extends StateNotifier<bool> {
         .doc(user.uid)
         .delete();
   }
+
+  Future<void> inviteToRoom(
+    String friendUid,
+    String roomId,
+    String roomCode,
+    String roomName,
+  ) async {
+    final user = _auth.currentUser;
+    if (user == null) return;
+
+    final myDoc = await _firestore.collection('users').doc(user.uid).get();
+    final myName = myDoc.data()?['displayUsername'] ?? 'A friend';
+
+    await _firestore
+        .collection('users')
+        .doc(friendUid)
+        .collection('roomInvites')
+        .add({
+          'fromUid': user.uid,
+          'fromUsername': myName,
+          'roomId': roomId,
+          'roomCode': roomCode,
+          'roomName': roomName,
+          'sentAt': FieldValue.serverTimestamp(),
+        });
+  }
 }
 
-final friendsNotifierProvider =
-    StateNotifierProvider<FriendsNotifier, bool>((ref) => FriendsNotifier());
+final friendsNotifierProvider = StateNotifierProvider<FriendsNotifier, bool>(
+  (ref) => FriendsNotifier(),
+);
+
+class RoomInvite {
+  final String id;
+  final String fromUsername;
+  final String roomId;
+  final String roomCode;
+  final String roomName;
+
+  const RoomInvite({
+    required this.id,
+    required this.fromUsername,
+    required this.roomId,
+    required this.roomCode,
+    required this.roomName,
+  });
+
+  factory RoomInvite.fromMap(Map<String, dynamic> map, String id) {
+    return RoomInvite(
+      id: id,
+      fromUsername: map['fromUsername'] ?? '',
+      roomId: map['roomId'] ?? '',
+      roomCode: map['roomCode'] ?? '',
+      roomName: map['roomName'] ?? '',
+    );
+  }
+}
+
+final roomInvitesProvider = StreamProvider<List<RoomInvite>>((ref) {
+  final user = _auth.currentUser;
+  if (user == null) return Stream.value([]);
+
+  return _firestore
+      .collection('users')
+      .doc(user.uid)
+      .collection('roomInvites')
+      .orderBy('sentAt', descending: true)
+      .snapshots()
+      .map(
+        (snapshot) => snapshot.docs
+            .map((doc) => RoomInvite.fromMap(doc.data(), doc.id))
+            .toList(),
+      );
+});
+
+Future<void> dismissRoomInvite(String inviteId) async {
+  final user = _auth.currentUser;
+  if (user == null) return;
+  await _firestore
+      .collection('users')
+      .doc(user.uid)
+      .collection('roomInvites')
+      .doc(inviteId)
+      .delete();
+}
+
+class PresenceInfo {
+  final bool isOnline;
+  final bool inGame;
+  const PresenceInfo({required this.isOnline, required this.inGame});
+}
+
+final friendPresenceProvider = StreamProvider.family<PresenceInfo, String>((ref, uid) {
+  final db = FirebaseDatabase.instance;
+  return db.ref('presence/$uid').onValue.map((event) {
+    final data = event.snapshot.value as Map?;
+    if (data == null) return const PresenceInfo(isOnline: false, inGame: false);
+    return PresenceInfo(
+      isOnline: data['state'] == 'online',
+      inGame: data['inGame'] == true,
+    );
+  });
+});

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../core/constants/app_colors.dart';
 import 'create_room_screen.dart';
 import 'join_room_screen.dart';
+import 'create_room_with_friends_screen.dart';
 
 class MultiplayerMenuScreen extends StatelessWidget {
   const MultiplayerMenuScreen({super.key});
@@ -13,8 +14,7 @@ class MultiplayerMenuScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('MULTIPLAYER'),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios,
-              color: AppColors.textPrimary),
+          icon: const Icon(Icons.arrow_back_ios, color: AppColors.textPrimary),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -30,8 +30,7 @@ class MultiplayerMenuScreen extends StatelessWidget {
               color: AppColors.primary,
               onTap: () => Navigator.push(
                 context,
-                MaterialPageRoute(
-                    builder: (_) => const CreateRoomScreen()),
+                MaterialPageRoute(builder: (_) => const CreateRoomScreen()),
               ),
             ),
             const SizedBox(height: 12),
@@ -42,8 +41,7 @@ class MultiplayerMenuScreen extends StatelessWidget {
               color: AppColors.secondary,
               onTap: () => Navigator.push(
                 context,
-                MaterialPageRoute(
-                    builder: (_) => const JoinRoomScreen()),
+                MaterialPageRoute(builder: (_) => const JoinRoomScreen()),
               ),
             ),
             const SizedBox(height: 12),
@@ -52,7 +50,14 @@ class MultiplayerMenuScreen extends StatelessWidget {
               subtitle: 'Invite & Play',
               icon: Icons.people,
               color: AppColors.accent,
-              onTap: () {},
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const CreateRoomWithFriendsScreen(),
+                  ),
+                );
+              },
             ),
             const SizedBox(height: 12),
             _MenuOption(
@@ -121,20 +126,15 @@ class _MenuOption extends StatelessWidget {
                 children: [
                   Text(
                     title,
-                    style: Theme.of(context)
-                        .textTheme
-                        .titleLarge
-                        ?.copyWith(color: AppColors.textPrimary),
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                      color: AppColors.textPrimary,
+                    ),
                   ),
-                  Text(
-                    subtitle,
-                    style: Theme.of(context).textTheme.bodyMedium,
-                  ),
+                  Text(subtitle, style: Theme.of(context).textTheme.bodyMedium),
                 ],
               ),
             ),
-            Icon(Icons.arrow_forward_ios,
-                color: color, size: 16),
+            Icon(Icons.arrow_forward_ios, color: color, size: 16),
           ],
         ),
       ),

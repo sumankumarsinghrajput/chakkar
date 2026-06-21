@@ -4,9 +4,9 @@ import '../../core/constants/app_colors.dart';
 import '../../shared/widgets/avatar_widget.dart';
 import '../auth/presentation/welcome_screen.dart';
 import 'profile_provider.dart';
-import '../match_history/match_history_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../settings/settings_screen.dart';
+import '../../shared/services/presence_service.dart';
 
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
@@ -225,6 +225,7 @@ class ProfileScreen extends ConsumerWidget {
                 // Sign Out
                 OutlinedButton(
                   onPressed: () async {
+                    await presenceService.goOffline();
                     await ref.read(profileNotifierProvider.notifier).signOut();
                     if (context.mounted) {
                       Navigator.pushAndRemoveUntil(

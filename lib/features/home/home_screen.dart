@@ -17,6 +17,7 @@ import '../settings/settings_screen.dart';
 import '../auth/data/upgrade_provider.dart';
 import '../auth/presentation/upgrade_dialog.dart';
 import '../rewards/rewards_screen.dart';
+import '../friends/friends_provider.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -135,12 +136,17 @@ class HomeScreen extends ConsumerWidget {
   }
 }
 
-class _TopBar extends StatelessWidget {
+class _TopBar extends ConsumerWidget {
   final dynamic user;
   const _TopBar({this.user});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final requestsAsync = ref.watch(friendRequestsProvider);
+    final requestCount = requestsAsync.maybeWhen(
+      data: (r) => r.length,
+      orElse: () => 0,
+    );
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       child: Row(
@@ -208,19 +214,49 @@ class _TopBar extends StatelessWidget {
           ),
           const SizedBox(width: 8),
           // Friends
-          IconButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const FriendsScreen()),
-              );
-            },
-            icon: const Icon(
-              Icons.people_outline,
-              color: AppColors.textSecondary,
-            ),
+          // Friends
+          Stack(
+            clipBehavior: Clip.none,
+            children: [
+              IconButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const FriendsScreen()),
+                  );
+                },
+                icon: const Icon(
+                  Icons.people_outline,
+                  color: AppColors.textSecondary,
+                ),
+              ),
+              if (requestCount > 0)
+                Positioned(
+                  right: 6,
+                  top: 6,
+                  child: Container(
+                    padding: const EdgeInsets.all(3),
+                    decoration: const BoxDecoration(
+                      color: AppColors.danger,
+                      shape: BoxShape.circle,
+                    ),
+                    constraints: const BoxConstraints(
+                      minWidth: 16,
+                      minHeight: 16,
+                    ),
+                    child: Text(
+                      '$requestCount',
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 9,
+                        fontFamily: 'Rajdhani',
+                      ),
+                    ),
+                  ),
+                ),
+            ],
           ),
-          // Settings
           // Settings
           IconButton(
             onPressed: () {
